@@ -1,0 +1,16 @@
+PODS:
+  - TFLiteSwift-Vision (0.1.0)
+
+DEPENDENCIES:
+  - TFLiteSwift-Vision (from `../`)
+
+EXTERNAL SOURCES:
+  TFLiteSwift-Vision:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  TFLiteSwift-Vision: 43c49b05503870cde2852fe4d6c4249a93fffe3b
+
+PODFILE CHECKSUM: 7559630038a7ecda7a046f887d9ad544948c1e4f
+
+COCOAPODS: 1.9.3
