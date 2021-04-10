@@ -26,4 +26,4 @@ tucan9389, tucan.dev@gmail.com
 
 ## License
 
-TFLiteSwift-Vision is available under the MIT license. See the LICENSE file for more info.
+TFLiteSwift-Vision is available under the Apache license. See the [LICENSE](LICENSE) file for more info.
