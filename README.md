@@ -11,7 +11,16 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Requirements
 
-## Installation
+### Download Model
+
+Download tflite model and label txt, and then import the files into Xcode project.
+
+> You can also download the following files on [here](https://www.tensorflow.org/lite/guide/hosted_models)
+
+- [mobilenet_v2_1.0_224.tflite](https://github.com/tucan9389/TFLiteSwift-Vision/releases/download/tflite-upload/mobilenet_v2_1.0_224.tflite)
+- [labels_mobilenet_quant_v1_224.txt](https://github.com/tucan9389/TFLiteSwift-Vision/releases/download/tflite-upload/labels_mobilenet_quant_v1_224.txt)
+
+### Installation
 
 TFLiteSwift-Vision is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:

@@ -41,3 +41,7 @@ build
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcworkspace/contents.xcworkspacedata
+
+*.tflite
+
+Example/TFLiteSwift-Vision/labels_mobilenet_quant_v1_224.txt
