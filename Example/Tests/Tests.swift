@@ -1,5 +1,4 @@
 import XCTest
-import TFLiteSwift_Vision
 
 class Tests: XCTestCase {
     
