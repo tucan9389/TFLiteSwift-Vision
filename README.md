@@ -13,6 +13,7 @@ This framework is a layer for vision's preprocessing and postprocessing when you
 
 - [Xcode](https://developer.apple.com/xcode/)
 - [CocodaPods](https://cocoapods.org/)
+- iOS 10.0+
 
 ## Getting Started with Example
 
@@ -131,7 +132,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
 - Postprocessing (convert TFLiteSwift's Tensor to Cocoa's type)
   - [ ] Tensor to UIImage
 - Domain specific postprocessing examples
-  - [ ] Image classification
+  - [x] Image classification
   - [ ] Object detection
   - [ ] Semantic segmentation
   - [ ] Pose estimation
