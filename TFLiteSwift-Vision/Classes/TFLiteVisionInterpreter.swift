@@ -122,7 +122,7 @@ public class TFLiteVisionInterpreter {
         // <#TODO#> - check quantization or not
     }
     
-    func preprocess(with input: TFLiteVisionInput) -> Data? {
+    public func preprocess(with input: TFLiteVisionInput) -> Data? {
         let modelInputSize = CGSize(width: options.inputWidth, height: options.inputHeight)
         guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize) else { return nil }
         
@@ -138,7 +138,7 @@ public class TFLiteVisionInterpreter {
         return inputData
     }
     
-    func preprocess(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect) -> Data? {
+    public func preprocess(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect) -> Data? {
         let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
         assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
         
@@ -158,7 +158,7 @@ public class TFLiteVisionInterpreter {
         return inputData
     }
     
-    func inference(with inputData: Data) -> [TFLiteFlatArray<Float32>]? {
+    public func inference(with inputData: Data) -> [TFLiteFlatArray<Float32>]? {
         // Copy the initialized `Data` to the input `Tensor`.
         do {
             // Copy input into interpreter's 0th `Tensor`.
@@ -182,10 +182,9 @@ public class TFLiteVisionInterpreter {
 
 extension TFLiteVisionInterpreter {
     public enum NormalizationOptions {
-        case none
-        case scaledNormalization
-        case pytorchNormalization
-        case meanStdNormalization
+        case none                   // 0...255
+        case scaledNormalization    // 0.0...1.0
+        case pytorchNormalization   // normalize with mean and std
     }
     
     public enum RankType {
@@ -205,7 +204,7 @@ extension TFLiteVisionInterpreter {
         let isGrayScale: Bool
         var inputChannel: Int { return isGrayScale ? 1 : 3 }
         
-        let normalization: NormalizationOptions // true: 0.0~1.0, false: 0.0~255.0
+        let normalization: NormalizationOptions
         
         public init(
             modelName: String,
@@ -216,7 +215,7 @@ extension TFLiteVisionInterpreter {
             inputHeight: Int,
             inputRankType: RankType = .bwhc,
             isGrayScale: Bool = false,
-            normalization: NormalizationOptions = .none
+            normalization: NormalizationOptions = .scaledNormalization
         ) {
             self.modelName = modelName
             self.threadCount = threadCount
@@ -252,7 +251,11 @@ extension TFLiteVisionInterpreter {
 public struct PreprocessOptions {
     let cropArea: CropArea
     
-    enum CropArea {
+    public init(cropArea: CropArea) {
+        self.cropArea = cropArea
+    }
+    
+    public enum CropArea {
         case customAspectFill(rect: CGRect)
         case squareAspectFill
     }

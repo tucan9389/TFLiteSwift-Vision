@@ -15,10 +15,8 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		998D214DDEFD6E2013C4D830 /* Pods_TFLiteSwift_Vision_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4CE55937B3F135EB0359872 /* Pods_TFLiteSwift_Vision_Example.framework */; };
-		C42C1A522624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt in Resources */ = {isa = PBXBuildFile; fileRef = C42C1A512624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt */; };
-		C42C1A532624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt in Resources */ = {isa = PBXBuildFile; fileRef = C42C1A512624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt */; };
-		C42C1A592624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite in Resources */ = {isa = PBXBuildFile; fileRef = C42C1A582624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite */; };
-		C42C1A5A2624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite in Resources */ = {isa = PBXBuildFile; fileRef = C42C1A582624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite */; };
+		C43C991F26D2241600742E3A /* mobilenet_v2_1.0_224.tflite in Resources */ = {isa = PBXBuildFile; fileRef = C43C991E26D2241600742E3A /* mobilenet_v2_1.0_224.tflite */; };
+		C43C992126D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt in Resources */ = {isa = PBXBuildFile; fileRef = C43C992026D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,8 +48,8 @@
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		75B127ADDC692C402A4048FC /* Pods-TFLiteSwift-Vision_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Tests.debug.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Tests/Pods-TFLiteSwift-Vision_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		B4CE55937B3F135EB0359872 /* Pods_TFLiteSwift_Vision_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFLiteSwift_Vision_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C42C1A512624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels_mobilenet_quant_v1_224.txt; sourceTree = "<group>"; };
-		C42C1A582624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = mobilenet_v2_1.0_224.tflite; sourceTree = "<group>"; };
+		C43C991E26D2241600742E3A /* mobilenet_v2_1.0_224.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = mobilenet_v2_1.0_224.tflite; sourceTree = "<group>"; };
+		C43C992026D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels_mobilenet_quant_v1_224.txt; sourceTree = "<group>"; };
 		C8B95A5E9727EAB9337E31C1 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Example.release.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Example/Pods-TFLiteSwift-Vision_Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -101,9 +99,9 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
-				C42C1A512624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt */,
-				C42C1A582624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
+				C43C991E26D2241600742E3A /* mobilenet_v2_1.0_224.tflite */,
+				C43C992026D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
@@ -255,11 +253,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C43C992126D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt in Resources */,
+				C43C991F26D2241600742E3A /* mobilenet_v2_1.0_224.tflite in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
-				C42C1A592624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
-				C42C1A522624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,8 +265,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C42C1A5A2624C7A300DF0DBC /* mobilenet_v2_1.0_224.tflite in Resources */,
-				C42C1A532624C79B00DF0DBC /* labels_mobilenet_quant_v1_224.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

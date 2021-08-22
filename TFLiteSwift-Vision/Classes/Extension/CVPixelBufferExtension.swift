@@ -176,8 +176,6 @@ extension CVPixelBuffer {
                 bytes[width * height + i    ] = (Float32(imageBytes[i * 3 + 1]) - 0.456) / 0.224 // G
                 bytes[width * height * 2 + i] = (Float32(imageBytes[i * 3 + 2]) - 0.406) / 0.225 // B
             }
-        } else if normalization == .meanStdNormalization {
-            assert(false, "not support '.meanStdNormalization'")
         } else {
             bytes = imageBytes.map { Float($0) } // not normalization
         }
