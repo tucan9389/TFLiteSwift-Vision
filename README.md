@@ -7,7 +7,7 @@
 
 ## Goal
 
-This libarary is a layer for vision's preprocessing and postprocessing when you are using [TensorFlowLiteSwift](https://cocoapods.org/pods/TensorFlowLiteSwift). You can use TFLiteSwift-Vision, if you want to implemented preprocessing and postprocessing functions in the repository. 
+This framework is a layer for vision's preprocessing and postprocessing when you are using [TensorFlowLiteSwift](https://cocoapods.org/pods/TensorFlowLiteSwift). You can use TFLiteSwift-Vision, if you want to implemented preprocessing and postprocessing functions in the repository. 
 
 ## Requirements
 
@@ -41,9 +41,9 @@ After build and run the project, you can test the model(`mobilenet_v2_1.0_224.tf
 | :-: |
 | ![demo-tfliteswift-vision-example-001](https://user-images.githubusercontent.com/37643248/130346511-cfdb21ce-c22c-4aec-b1e6-c4da81ae94d5.gif) |
 
+## Usage
 
-
-## Installation in Your Own Project
+### Install the TFLiteSwift-Vision
 
 TFLiteSwift-Vision is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
@@ -56,6 +56,50 @@ target 'MyXcodeProject' do
   pod 'TFLiteSwift-Vision'
 
 end
+```
+
+### Add `.tflite` file in the Xcode Project
+
+<img width="500px" alt="importing-tflite-into-xcode" src="https://user-images.githubusercontent.com/37643248/130346788-19431b71-4ae6-47d2-9903-a90fb6a0c2d2.png">
+
+> If you have other label file or other meta data file, also import it.
+
+### Implement Inference Code
+
+Import TFLiteSwift_Vision framework.
+
+```swift
+import TFLiteSwift_Vision
+```
+
+Setup interpreter.
+
+```swift
+var visionInterpreter = TFLiteVisionInterpreter(options: TFLiteVisionInterpreter.Options(
+  modelName: "mobilenet_v2_1.0_224",   // if the filename is mobilenet_v2_1.0_224.tflite
+  inputWidth: 224, inputHeight: 224,   
+  normalization: .scaledNormalization  // nomalize input data into 0.0...1.0 range
+))
+```
+
+Inference with an image. The following is an image classification case.
+
+```swift
+let preprocessOptions = PreprocessOptions(cropArea: .squareAspectFill)
+let input: TFLiteVisionInput = .uiImage(uiImage: uiImage, preprocessOptions: preprocessOptions)
+
+// preprocess
+guard let inputData: Data = visionInterpreter.preprocess(with: input)
+	else { fatalError("Cannot preprcess") }
+
+// inference
+guard let outputs: TFLiteFlatArray<Float32> = visionInterpreter.inference(with: inputData)?.first
+	else { fatalError("Cannot inference") }
+
+// postprocess
+let predictedIndex: Int = Int(outputs.argmax())
+print("predicted index: \(predictedLabel)")
+print(outputs.dimensions)
 ```
 
 ## Done and TODO
