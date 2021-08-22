@@ -107,42 +107,34 @@ print(outputs.dimensions)
 TFLiteSwift-Vision is supporting (or wants to support) follow functions:
 
 - Preprocessing (convert Cocoa's image type to TFLiteSwift's Tensor)
-
   - Supporting Cocoa image type:
-
     - [x] UIImage → Data
-
     - [x] CVPixelBuffer → Data
     - [ ] CGImage → Data
-
   - Supporting normalization methods:
-
     - [x] Normalization with scaling (0...255 → 0.0...1.0)
     - [x] Normalization with mean and std (normaly used in pytorch and it is used in ImageNet firstly)
     - [ ] Grayscaling (not to 4 dim tensor, but to 3 dim tensor from an image)
-
   - Supporting cropping methods:
-
     - [x] Resizing (`vImageScale_ARGB8888`)
     - [ ] Centercropping
     - [ ] Padding
     - If basic functions are implemented, need to optimize with Metal or Accelerate (or other domain specific frameworks)
-
   - [ ] Support quantization
-
     - [ ] Float16
     - [ ] UInt8
-
 - Inferenceing
-
   - batch size
     - [x] 1 batch
     - [ ] n batch
   - [x] cpu or gpu(metal) selectable
-
 - Postprocessing (convert TFLiteSwift's Tensor to Cocoa's type)
-
   - [ ] Tensor to UIImage
+- Domain specific postprocessing examples
+  - [ ] Image classification
+  - [ ] Object detection
+  - [ ] Semantic segmentation
+  - [ ] Pose estimation
 
 ## Author
 
