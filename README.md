@@ -131,6 +131,13 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [x] CVPixelBuffer → Data
     - [ ] CGImage → Data
     - [ ] MTLTexture → Data
+  - Supporing bhwc sequence:
+    - [x] bwhc
+    - [x] bcwh
+    - [ ] whc
+    - [ ] hwc
+    - [ ] bwh (for grayscale input)
+    - [ ] wh (for grayscale input)
   - Supporting normalization methods:
     - [x] Normalization with scaling (0...255 → 0.0...1.0)
     - [x] Normalization with mean and std (normaly used in pytorch and it is used in ImageNet firstly)
