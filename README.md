@@ -132,8 +132,8 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [ ] CGImage → Data
     - [ ] MTLTexture → Data
   - Supporing bhwc sequence:
-    - [x] bwhc
-    - [x] bcwh
+    - [x] bwhc (normally used in TF)
+    - [x] bcwh (noramlly used in Pytorch)
     - [ ] whc
     - [ ] hwc
     - [ ] bwh (for grayscale input)
