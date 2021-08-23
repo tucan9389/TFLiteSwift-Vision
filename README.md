@@ -112,6 +112,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [x] UIImage → Data
     - [x] CVPixelBuffer → Data
     - [ ] CGImage → Data
+    - [ ] MTLTexture → Data
   - Supporting normalization methods:
     - [x] Normalization with scaling (0...255 → 0.0...1.0)
     - [x] Normalization with mean and std (normaly used in pytorch and it is used in ImageNet firstly)
@@ -130,7 +131,8 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [ ] n batch
   - [x] cpu or gpu(metal) selectable
 - Postprocessing (convert TFLiteSwift's Tensor to Cocoa's type)
-  - [ ] Tensor to UIImage
+  - [ ] Tensor → UIImage
+  - [ ] Tensor → MTLTexture
 - Domain specific postprocessing examples
   - [x] Image classification
   - [ ] Object detection
