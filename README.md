@@ -21,7 +21,7 @@ This framework is a layer for vision's preprocessing and postprocessing when you
 
 ![image](https://user-images.githubusercontent.com/37643248/130391342-6b83f6a7-9748-401c-89d5-33148f3ec2cc.png)
 
-[Here](https://github.com/tucan9389/TFLiteSwift-Vision/issues/3) is more detail of this repo's background and goal.
+[Here](https://github.com/tucan9389/TFLiteSwift-Vision/issues/3) is more detail of this repo's background and goal, and what is diff.
 
 ## Requirements
 
