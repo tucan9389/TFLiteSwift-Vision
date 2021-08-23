@@ -5,6 +5,14 @@
 [![License](https://img.shields.io/cocoapods/l/TFLiteSwift-Vision.svg?style=flat)](https://cocoapods.org/pods/TFLiteSwift-Vision)
 [![Platform](https://img.shields.io/cocoapods/p/TFLiteSwift-Vision.svg?style=flat)](https://cocoapods.org/pods/TFLiteSwift-Vision)
 
+- [Goal](#goal)
+- [Requirements](#Requirements)
+- [Getting Started with Example](#Getting-Started-with-Example)
+- [Usage](#Usage)
+- [Done and TODO](#Done-and-TODO)
+- [Architecture](#Architecture)
+- [License](#License)
+
 ## Goal
 
 This framework is a layer for vision's preprocessing and postprocessing when you are using [TensorFlowLiteSwift](https://cocoapods.org/pods/TensorFlowLiteSwift). You can use TFLiteSwift-Vision, if you want to implemented preprocessing and postprocessing functions in the repository. 
@@ -106,6 +114,10 @@ let predictedIndex: Int = Int(outputs.argmax())
 print("predicted index: \(predictedLabel)")
 print(outputs.dimensions)
 ```
+
+## Architecture
+
+![tfliteswift-vision-architecture](https://user-images.githubusercontent.com/37643248/130388924-eab0313c-8b7a-422e-9877-a7e7d6c00448.png)
 
 ## Done and TODO
 
