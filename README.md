@@ -5,13 +5,15 @@
 [![License](https://img.shields.io/cocoapods/l/TFLiteSwift-Vision.svg?style=flat)](https://cocoapods.org/pods/TFLiteSwift-Vision)
 [![Platform](https://img.shields.io/cocoapods/p/TFLiteSwift-Vision.svg?style=flat)](https://cocoapods.org/pods/TFLiteSwift-Vision)
 
-- [Goal](#goal)
-- [Requirements](#Requirements)
-- [Getting Started with Example](#Getting-Started-with-Example)
-- [Usage](#Usage)
-- [Done and TODO](#Done-and-TODO)
-- [Architecture](#Architecture)
-- [License](#License)
+## Table
+
+- [🎯 Goal](#goal)
+- [🍽 Requirements](#Requirements)
+- [👩‍💻 Getting Started with Example](#Getting-Started-with-Example)
+- [🏛 Usage](#Usage)
+- [✅ Done and TODO](#Done-and-TODO)
+- [🏗 Architecture](#Architecture)
+- [📜 License](#License)
 
 ## Goal
 
