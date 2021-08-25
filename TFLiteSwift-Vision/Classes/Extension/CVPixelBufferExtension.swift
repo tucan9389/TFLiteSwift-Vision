@@ -24,6 +24,7 @@
 
 import Accelerate
 import Foundation
+import TensorFlowLite
 
 extension CVPixelBuffer {
     var size: CGSize {
@@ -115,7 +116,7 @@ extension CVPixelBuffer {
     ///       floating point values).
     /// - Returns: The RGB data representation of the image buffer or `nil` if the buffer could not be
     ///     converted.
-    func rgbData(byteCount: Int, normalization: TFLiteVisionInterpreter.NormalizationOptions = .none, isModelQuantized: Bool) -> Data? {
+    func rgbData(byteCount: Int, normalization: TFLiteVisionInterpreter.NormalizationOptions = .none, isModelQuantized: Bool, dataType: Tensor.DataType = .float32) -> Data? {
         CVPixelBufferLockBaseAddress(self, .readOnly)
         defer { CVPixelBufferUnlockBaseAddress(self, .readOnly) }
         guard let sourceData = CVPixelBufferGetBaseAddress(self) else {
@@ -165,20 +166,27 @@ extension CVPixelBuffer {
         if isModelQuantized { return imageByteData }
         
         let imageBytes = [UInt8](imageByteData)
-        var bytes: [Float] = []
-        if normalization == .scaledNormalization {
-            bytes = imageBytes.map { Float($0) / 255.0 } // normalization
-        } else if normalization == .pytorchNormalization {
-            // bytes = imageBytes.map { Float($0) / 255.0 } // normalization
-            bytes = imageBytes.map { Float($0) } // normalization
-            for i in 0 ..< width * height {
-                bytes[i                     ] = (Float32(imageBytes[i * 3 + 0]) - 0.485) / 0.229 // R
-                bytes[width * height + i    ] = (Float32(imageBytes[i * 3 + 1]) - 0.456) / 0.224 // G
-                bytes[width * height * 2 + i] = (Float32(imageBytes[i * 3 + 2]) - 0.406) / 0.225 // B
+        
+        switch dataType {
+        case .uInt8:
+            return Data(copyingBufferOf: imageBytes)
+        case .float32:
+            switch normalization {
+            case .none:
+                return Data(copyingBufferOf: imageBytes.map { Float($0) })
+            case .scaled(from: let from, to: let to):
+                return Data(copyingBufferOf: imageBytes.map { element -> Float in ((Float(element) * (1.0 / 255.0)) * (to - from)) + from })
+            case .meanStd(mean: let mean, std: let std):
+                var bytes = imageBytes.map { Float($0) } // normalization
+                for i in 0 ..< width * height {
+                    bytes[width * height * 0 + i] = (Float32(imageBytes[i * 3 + 0]) - mean[0]) / std[0] // R
+                    bytes[width * height * 1 + i] = (Float32(imageBytes[i * 3 + 1]) - mean[1]) / std[1] // G
+                    bytes[width * height * 2 + i] = (Float32(imageBytes[i * 3 + 2]) - mean[2]) / std[2] // B
+                }
+                return Data(copyingBufferOf: bytes)
             }
-        } else {
-            bytes = imageBytes.map { Float($0) } // not normalization
+        default:
+            fatalError("don't support the type: \(dataType)")
         }
-        return Data(copyingBufferOf: bytes)
     }
 }

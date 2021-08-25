@@ -29,13 +29,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
         
         let interpreterOptions = TFLiteVisionInterpreter.Options(
             modelName: "mobilenet_v2_1.0_224",
-            inputWidth: 224, inputHeight: 224,
-            normalization: .scaledNormalization
+            inputRankType: .bwhc,
+            normalization: .scaled(from: 0.0, to: 1.0)
         )
         visionInterpreter = TFLiteVisionInterpreter(options: interpreterOptions)
         
-        if let labelFilePath = Bundle.main.path(forResource: "labels_mobilenet_quant_v1_224", ofType: "txt") {
+         if let labelFilePath = Bundle.main.path(forResource: "labels_mobilenet_quant_v1_224", ofType: "txt") {
             labels = try? String(contentsOfFile: labelFilePath).split(separator: "\n").map { String($0) }
+            // labels?.remove(at: 0)
         }
         
         print(labels ?? "N/A labels")
@@ -73,7 +74,7 @@ extension ViewController: UIImagePickerControllerDelegate {
                 // inference
                 guard let outputs: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: inputData)?.first
                     else { fatalError("Cannot inference") }
-                
+                 
                 print(outputs.dimensions)
                 let predictedIndex: Int = Int(outputs.argmax())
                 

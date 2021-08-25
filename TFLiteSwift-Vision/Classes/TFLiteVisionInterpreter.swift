@@ -35,6 +35,32 @@ public class TFLiteVisionInterpreter {
     var inputTensor: Tensor?
     var outputTensors: [Tensor] = []
     
+    var inputWidth: Int? {
+        switch options.inputRankType {
+        case .bwhc:
+            return inputTensor?.shape.dimensions[1]
+        case .bchw:
+            return inputTensor?.shape.dimensions[3]
+        case .bhwc:
+            return inputTensor?.shape.dimensions[2]
+        case .bcwh:
+            return inputTensor?.shape.dimensions[2]
+        }
+    }
+    
+    var inputHeight: Int? {
+        switch options.inputRankType {
+        case .bwhc:
+            return inputTensor?.shape.dimensions[2]
+        case .bchw:
+            return inputTensor?.shape.dimensions[2]
+        case .bhwc:
+            return inputTensor?.shape.dimensions[1]
+        case .bcwh:
+            return inputTensor?.shape.dimensions[3]
+        }
+    }
+    
     public init(options: Options) {
         guard let modelPath = Bundle.main.path(forResource: options.modelName, ofType: "tflite") else {
             fatalError("Failed to load the model file with name: \(options.modelName).")
@@ -86,27 +112,14 @@ public class TFLiteVisionInterpreter {
         // 4. (c, h, w) color or gray <#TODO#>
         // 5. (w, h) gray <#TODO#>
         // 6. (h, w) gray <#TODO#>
-
-        // check input tensor dimension
-        if options.inputRankType == .bwhc {
-            guard inputTensor.shape.dimensions[0] == 1,
-                inputTensor.shape.dimensions[1] == options.inputWidth,
-                inputTensor.shape.dimensions[2] == options.inputHeight,
-                inputTensor.shape.dimensions[3] == options.inputChannel
-            else {
-                fatalError("Unexpected Model: input shape \n\(inputTensor.shape) != [\(1), \(options.inputWidth), \(options.inputHeight), \(options.inputChannel)]")
-            }
-        } else if options.inputRankType == .bchw {
-            guard inputTensor.shape.dimensions[0] == 1,
-                inputTensor.shape.dimensions[1] == options.inputChannel,
-                inputTensor.shape.dimensions[2] == options.inputHeight,
-                inputTensor.shape.dimensions[3] == options.inputWidth
-            else {
-                fatalError("Unexpected Model: input shape \n\(inputTensor.shape) != [\(1), \(options.inputChannel), \(options.inputHeight), \(options.inputWidth)]")
-            }
-        }
         
+        // print("inputTensor.dataType:", inputTensor.dataType)
+        // float32, uInt8
+        // maybe exist: float16, uInt4, ...,
+
         self.inputTensor = inputTensor
+        
+        try interpreter.invoke()
         
         // output tensor
         let outputTensors = try (0..<interpreter.outputTensorCount).map { outputTensorIndex -> Tensor in
@@ -117,20 +130,25 @@ public class TFLiteVisionInterpreter {
         outputTensors.enumerated().forEach { (offset, outputTensor) in
             // <#TODO#>
         }
+        
         self.outputTensors = outputTensors
         
         // <#TODO#> - check quantization or not
     }
     
     public func preprocess(with input: TFLiteVisionInput) -> Data? {
-        let modelInputSize = CGSize(width: options.inputWidth, height: options.inputHeight)
+        guard let inputWidth = inputWidth, let inputHeight = inputHeight else { return nil }
+        
+        let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
         guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize) else { return nil }
         
         // Remove the alpha component from the image buffer to get the initialized `Data`.
-        let byteCount = 1 * options.inputHeight * options.inputWidth * options.inputChannel
+        let byteCount = 1 * inputHeight * inputWidth * options.inputChannel
+        let inputDataType = inputTensor?.dataType ?? .float32
         guard let inputData = thumbnail.rgbData(byteCount: byteCount,
                                                 normalization: options.normalization,
-                                                isModelQuantized: options.isQuantized) else {
+                                                isModelQuantized: options.isQuantized,
+                                                dataType: inputDataType) else {
             print("Failed to convert the image buffer to RGB data.")
             return nil
         }
@@ -139,15 +157,17 @@ public class TFLiteVisionInterpreter {
     }
     
     public func preprocess(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect) -> Data? {
+        guard let inputWidth = inputWidth, let inputHeight = inputHeight else { return nil }
+        
         let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
         assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
         
         // Resize `targetSquare` of input image to `modelSize`.
-        let modelSize = CGSize(width: options.inputWidth, height: options.inputHeight)
+        let modelSize = CGSize(width: inputWidth, height: inputHeight)
         guard let thumbnail = pixelBuffer.resize(from: targetSquare, to: modelSize) else { return nil }
         
         // Remove the alpha component from the image buffer to get the initialized `Data`.
-        let byteCount = 1 * options.inputHeight * options.inputWidth * options.inputChannel
+        let byteCount = 1 * inputHeight * inputWidth * options.inputChannel
         guard let inputData = thumbnail.rgbData(byteCount: byteCount,
                                                 normalization: options.normalization,
                                                 isModelQuantized: options.isQuantized) else {
@@ -172,7 +192,7 @@ public class TFLiteVisionInterpreter {
                 outputTensors[index] = try interpreter.output(at: index)
             }
         } catch /*let error*/ {
-            // fatalError("Failed to invoke the interpreter with error:" + error.localizedDescription)
+            fatalError("Failed to invoke the interpreter with error:" + error.localizedDescription)
             return nil
         }
         
@@ -183,13 +203,19 @@ public class TFLiteVisionInterpreter {
 extension TFLiteVisionInterpreter {
     public enum NormalizationOptions {
         case none                   // 0...255
-        case scaledNormalization    // 0.0...1.0
-        case pytorchNormalization   // normalize with mean and std
+        case scaled(from: Float, to: Float)
+        case meanStd(mean: [Float], std: [Float])
+        
+        static var pytorchNormalization: NormalizationOptions {
+            return .meanStd(mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225])
+        }
     }
     
     public enum RankType {
         case bwhc // usually tensorflow model
+        case bhwc
         case bchw // usually pytorch model
+        case bcwh
     }
     
     public struct Options {
@@ -198,8 +224,6 @@ extension TFLiteVisionInterpreter {
         let accelerator: Accelerator
         let isQuantized: Bool
         
-        let inputWidth: Int
-        let inputHeight: Int
         let inputRankType: RankType
         let isGrayScale: Bool
         var inputChannel: Int { return isGrayScale ? 1 : 3 }
@@ -209,13 +233,11 @@ extension TFLiteVisionInterpreter {
         public init(
             modelName: String,
             threadCount: Int = 1,
-            accelerator: Accelerator = .metal,
+            accelerator: Accelerator = .cpu,
             isQuantized: Bool = false,
-            inputWidth: Int,
-            inputHeight: Int,
             inputRankType: RankType = .bwhc,
             isGrayScale: Bool = false,
-            normalization: NormalizationOptions = .scaledNormalization
+            normalization: NormalizationOptions = .scaled(from: 0.0, to: 1.0)
         ) {
             self.modelName = modelName
             self.threadCount = threadCount
@@ -225,8 +247,6 @@ extension TFLiteVisionInterpreter {
             self.accelerator = accelerator
             #endif
             self.isQuantized = isQuantized
-            self.inputWidth = inputWidth
-            self.inputHeight = inputHeight
             self.inputRankType = inputRankType
             self.isGrayScale = isGrayScale
             self.normalization = normalization
