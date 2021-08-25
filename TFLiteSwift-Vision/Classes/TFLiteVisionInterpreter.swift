@@ -193,7 +193,6 @@ public class TFLiteVisionInterpreter {
             }
         } catch /*let error*/ {
             fatalError("Failed to invoke the interpreter with error:" + error.localizedDescription)
-            return nil
         }
         
         return outputTensors.map { TFLiteFlatArray(tensor: $0) }
