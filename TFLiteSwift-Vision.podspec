@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TFLiteSwift-Vision'
-  s.version          = '0.1.0'
-  s.summary          = 'A short description of TFLiteSwift-Vision.'
+  s.version          = '0.1.1'
+  s.summary          = 'A layer for vision\'s pre/post-processing when you are using TensorFlowLiteSwift'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+  This framework is a layer for vision's preprocessing and postprocessing when you are using TensorFlowLiteSwift. You can use TFLiteSwift-Vision, if you want to implemented preprocessing and postprocessing functions in the repository.
                        DESC
 
   s.homepage         = 'https://github.com/tucan9389/TFLiteSwift-Vision'
@@ -31,6 +31,9 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '10.0'
 
   s.source_files = 'TFLiteSwift-Vision/Classes/**/*'
+
+  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   
   # s.resource_bundles = {
   #   'TFLiteSwift-Vision' => ['TFLiteSwift-Vision/Assets/*.png']
