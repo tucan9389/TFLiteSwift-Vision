@@ -8,38 +8,29 @@
 import Foundation
 
 public enum TFLiteVisionInput {
-    case pixelBuffer(pixelBuffer: CVPixelBuffer, preprocessOptions: PreprocessOptions)
-    case uiImage(uiImage: UIImage, preprocessOptions: PreprocessOptions)
+    case pixelBuffer(pixelBuffer: CVPixelBuffer)
+    case uiImage(uiImage: UIImage)
     
     var pixelBuffer: CVPixelBuffer? {
         switch self {
-        case .pixelBuffer(let pixelBuffer, _):
+        case .pixelBuffer(let pixelBuffer):
             return pixelBuffer
-        case .uiImage(let uiImage, _):
+        case .uiImage(let uiImage):
             return uiImage.pixelBufferFromImage()
-        }
-    }
-    
-    var cropArea: PreprocessOptions.CropArea {
-        switch self {
-        case .pixelBuffer(_, let preprocessOptions):
-            return preprocessOptions.cropArea
-        case .uiImage(_, let preprocessOptions):
-            return preprocessOptions.cropArea
         }
     }
     
     var imageSize: CGSize {
         switch self {
-        case .pixelBuffer(let pixelBuffer, _):
+        case .pixelBuffer(let pixelBuffer):
             return pixelBuffer.size
-        case .uiImage(let uiImage, _):
+        case .uiImage(let uiImage):
             return uiImage.size
         }
     }
     
-    var targetSquare: CGRect {
-        switch cropArea {
+    func targetSize(cropType: TFLiteVisionInterpreter.CropType) -> CGRect {
+        switch cropType {
         case .customAspectFill(let rect):
             return rect
         case .squareAspectFill:
@@ -51,12 +42,13 @@ public enum TFLiteVisionInput {
         }
     }
     
-    func croppedPixelBuffer(with inputModelSize: CGSize) -> CVPixelBuffer? {
+    func croppedPixelBuffer(with inputModelSize: CGSize, and cropType: TFLiteVisionInterpreter.CropType) -> CVPixelBuffer? {
         guard let pixelBuffer = pixelBuffer else { return nil }
         let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
         assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
         
-        // Resize `targetSquare` of input image to `modelSize`.
-        return pixelBuffer.resize(from: targetSquare, to: inputModelSize)
+        let targetSize = targetSize(cropType: cropType)
+        // Resize `targetSize` of input image to `modelSize`.
+        return pixelBuffer.resize(from: targetSize, to: inputModelSize)
     }
 }
