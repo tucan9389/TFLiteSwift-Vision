@@ -62,11 +62,11 @@ extension ViewController: UIImagePickerControllerDelegate {
                 guard let self = self else { return }
                 
                 // inference
-                guard let outputs: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: uiImage)
+                guard let output: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: uiImage)
                     else { fatalError("Cannot inference") }
                  
-                print(outputs.dimensions)
-                let predictedIndex: Int = Int(outputs.argmax())
+                print(output.dimensions)
+                let predictedIndex: Int = Int(output.argmax())
                 
                 guard let predictedLabel = self.labels?[predictedIndex]
                     else { fatalError("Cannot get label") }
