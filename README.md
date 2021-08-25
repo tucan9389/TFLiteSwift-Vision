@@ -7,13 +7,13 @@
 
 ## Table
 
-- [🎯 Goal](#goal)
-- [🍽 Requirements](#Requirements)
-- [👨‍💻 Getting Started with Example](#Getting-Started-with-Example)
-- [🏛 Usage](#Usage)
-- [✅ Done and TODO](#Done-and-TODO)
-- [🏗 Architecture](#Architecture)
-- [📜 License](#License)
+- [Goal](#goal)
+- [Requirements](#Requirements)
+- [Getting Started with Example](#Getting-Started-with-Example)
+- [Usage](#Usage)
+- [Done and TODO](#Done-and-TODO)
+- [Architecture](#Architecture)
+- [License](#License)
 
 ## Goal
 
@@ -91,24 +91,17 @@ Setup interpreter.
 
 ```swift
 var visionInterpreter = TFLiteVisionInterpreter(options: TFLiteVisionInterpreter.Options(
-  modelName: "mobilenet_v2_1.0_224",   // if the filename is mobilenet_v2_1.0_224.tflite
-  inputWidth: 224, inputHeight: 224,   
-  normalization: .scaledNormalization  // nomalize input data into 0.0...1.0 range
+  modelName: "mobilenet_v2_1.0_224",
+  inputRankType: .bwhc,
+  normalization: .scaled(from: 0.0, to: 1.0)
 ))
 ```
 
 Inference with an image. The following is an image classification case.
 
 ```swift
-let preprocessOptions = PreprocessOptions(cropArea: .squareAspectFill)
-let input: TFLiteVisionInput = .uiImage(uiImage: uiImage, preprocessOptions: preprocessOptions)
-
-// preprocess
-guard let inputData: Data = visionInterpreter.preprocess(with: input)
-	else { fatalError("Cannot preprcess") }
-
 // inference
-guard let outputs: TFLiteFlatArray<Float32> = visionInterpreter.inference(with: inputData)?.first
+guard let output: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: uiImage)
 	else { fatalError("Cannot inference") }
 
 // postprocess
@@ -128,7 +121,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
 - Preprocessing (convert Cocoa's image type to TFLiteSwift's Tensor)
   - Supporting Cocoa image type:
     - [x] UIImage → Data
-    - [x] CVPixelBuffer → Data
+    - [ ] CVPixelBuffer → Data
     - [ ] CGImage → Data
     - [ ] MTLTexture → Data
   - Supporing bhwc sequence:
@@ -147,6 +140,9 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [ ] Centercropping
     - [ ] Padding
     - If basic functions are implemented, need to optimize with Metal or Accelerate (or other domain specific frameworks)
+  - Supporting input type
+    - [x] Float32
+    - [x] UInt8
   - [ ] Support quantization
     - [ ] Float16
     - [ ] UInt8
