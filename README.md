@@ -31,33 +31,6 @@ This library is a [TensorFlowLiteSwift](https://cocoapods.org/pods/TensorFlowLit
 - [CocodaPods](https://cocoapods.org/)
 - iOS 10.0+
 
-## Getting Started with Example
-
-### Clone and open the Example project
-
-```shell
-git clone https://github.com/tucan9389/TFLiteSwift-Vision
-cd TFLiteSwift-Vision/Example
-pod install
-open TFLiteSwift-Vision.xcworkspace
-```
-
-### Download model and label file
-
-Download tflite model and label txt, and then import the files into Xcode project.
-
-> You can also download the following files on [here](https://www.tensorflow.org/lite/guide/hosted_models)
-- [mobilenet_v2_1.0_224.tflite](https://github.com/tucan9389/TFLiteSwift-Vision/releases/download/tflite-upload/mobilenet_v2_1.0_224.tflite)
-- [labels_mobilenet_quant_v1_224.txt](https://github.com/tucan9389/TFLiteSwift-Vision/releases/download/tflite-upload/labels_mobilenet_quant_v1_224.txt)
-
-### Build and Run
-
-After build and run the project, you can test the model(`mobilenet_v2_1.0_224.tflite`) with your own image data.
-
-| image classification |
-| :-: |
-| ![demo-tfliteswift-vision-example-001](https://user-images.githubusercontent.com/37643248/130346511-cfdb21ce-c22c-4aec-b1e6-c4da81ae94d5.gif) |
-
 ## Usage
 
 ### Install the TFLiteSwift-Vision
@@ -111,6 +84,35 @@ let predictedIndex: Int = Int(outputs.argmax())
 print("predicted index: \(predictedLabel)")
 print(outputs.dimensions)
 ```
+
+
+## Getting Started with Example
+
+### Clone and open the Example project
+
+```shell
+git clone https://github.com/tucan9389/TFLiteSwift-Vision
+cd TFLiteSwift-Vision/Example
+pod install
+open TFLiteSwift-Vision.xcworkspace
+```
+
+### Download model and label file
+
+Download tflite model and label txt, and then import the files into Xcode project.
+
+> You can also download the following files on [here](https://www.tensorflow.org/lite/guide/hosted_models)
+- [mobilenet_v2_1.0_224.tflite](https://github.com/tucan9389/TFLiteSwift-Vision/releases/download/tflite-upload/mobilenet_v2_1.0_224.tflite)
+- [labels_mobilenet_quant_v1_224.txt](https://github.com/tucan9389/TFLiteSwift-Vision/releases/download/tflite-upload/labels_mobilenet_quant_v1_224.txt)
+
+### Build and Run
+
+After build and run the project, you can test the model(`mobilenet_v2_1.0_224.tflite`) with your own image data.
+
+| image classification |
+| :-: |
+| ![demo-tfliteswift-vision-example-001](https://user-images.githubusercontent.com/37643248/130346511-cfdb21ce-c22c-4aec-b1e6-c4da81ae94d5.gif) |
+
 
 ## Architecture
 
