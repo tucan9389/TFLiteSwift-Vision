@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TFLiteSwift-Vision'
-  s.version          = '0.2.0'
+  s.version          = '0.2.1'
   s.summary          = 'A layer for vision\'s pre/post-processing when you are using TensorFlowLiteSwift'
 
 # This description is used to generate tags and improve search results.
@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
 
   s.homepage         = 'https://github.com/tucan9389/TFLiteSwift-Vision'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.license          = { :type => 'Apache 2.0', :file => 'LICENSE' }
   s.author           = { 'tucan9389' => 'tucan.dev@gmail.com' }
   s.source           = { :git => 'https://github.com/tucan9389/TFLiteSwift-Vision.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
@@ -32,7 +32,7 @@ Pod::Spec.new do |s|
   s.swift_version = '5.0'
 
   s.source_files = 'TFLiteSwift-Vision/Classes/**/*'
-
+  
   s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   

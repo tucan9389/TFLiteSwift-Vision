@@ -225,10 +225,10 @@ extension TFLiteVisionInterpreter {
     }
     
     public enum RankType {
-        case bwhc // usually tensorflow model
-        case bhwc
-        case bchw // usually pytorch model
-        case bcwh
+        case bhwc // usually tensorflow model
+        case bwhc
+        case bcwh // usually pytorch model
+        case bchw
     }
     
     public enum CropType {
