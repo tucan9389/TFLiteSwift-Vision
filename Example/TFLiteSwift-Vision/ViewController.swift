@@ -14,10 +14,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
     let picker = UIImagePickerController()
     
     var visionInterpreter: TFLiteVisionInterpreter?
-    
-    var preprocessOptions: PreprocessOptions {
-        return PreprocessOptions(cropArea: .squareAspectFill)
-    }
     var labels: [String]?
 
     @IBOutlet weak var mainImageView: UIImageView!
@@ -65,14 +61,8 @@ extension ViewController: UIImagePickerControllerDelegate {
             DispatchQueue(label: "com.tucan9389.inference", qos: .userInteractive).async { [weak self] in
                 guard let self = self else { return }
                 
-                let input: TFLiteVisionInput = .uiImage(uiImage: uiImage, preprocessOptions: self.preprocessOptions)
-                
-                // preprocess
-                guard let inputData: Data = self.visionInterpreter?.preprocess(with: input)
-                    else { fatalError("Cannot preprcess") }
-                
                 // inference
-                guard let outputs: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: inputData)?.first
+                guard let outputs: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: uiImage)
                     else { fatalError("Cannot inference") }
                  
                 print(outputs.dimensions)
