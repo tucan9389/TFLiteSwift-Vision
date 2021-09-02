@@ -140,7 +140,7 @@ public class TFLiteVisionInterpreter {
         guard let inputWidth = inputWidth, let inputHeight = inputHeight else { return nil }
         
         let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
-        guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize) else { return nil }
+        guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize, and: options.cropType) else { return nil }
         
         // Remove the alpha component from the image buffer to get the initialized `Data`.
         let byteCount = 1 * inputHeight * inputWidth * options.inputChannel
@@ -193,10 +193,23 @@ public class TFLiteVisionInterpreter {
             }
         } catch /*let error*/ {
             fatalError("Failed to invoke the interpreter with error:" + error.localizedDescription)
-            return nil
         }
         
         return outputTensors.map { TFLiteFlatArray(tensor: $0) }
+    }
+    
+    public func inference(with uiImage: UIImage) -> TFLiteFlatArray<Float32>? {
+        let input: TFLiteVisionInput = .uiImage(uiImage: uiImage)
+        
+        // preprocess
+        guard let inputData: Data = preprocess(with: input)
+            else { fatalError("Cannot preprcess") }
+        
+        // inference
+        guard let output: TFLiteFlatArray<Float32> = inference(with: inputData)?.first
+            else { fatalError("Cannot inference") }
+        
+        return output
     }
 }
 
@@ -218,6 +231,11 @@ extension TFLiteVisionInterpreter {
         case bcwh
     }
     
+    public enum CropType {
+        case customAspectFill(rect: CGRect)
+        case squareAspectFill
+    }
+    
     public struct Options {
         let modelName: String
         let threadCount: Int
@@ -229,6 +247,7 @@ extension TFLiteVisionInterpreter {
         var inputChannel: Int { return isGrayScale ? 1 : 3 }
         
         let normalization: NormalizationOptions
+        let cropType: CropType
         
         public init(
             modelName: String,
@@ -237,7 +256,8 @@ extension TFLiteVisionInterpreter {
             isQuantized: Bool = false,
             inputRankType: RankType = .bwhc,
             isGrayScale: Bool = false,
-            normalization: NormalizationOptions = .scaled(from: 0.0, to: 1.0)
+            normalization: NormalizationOptions = .scaled(from: 0.0, to: 1.0),
+            cropType: CropType = .squareAspectFill
         ) {
             self.modelName = modelName
             self.threadCount = threadCount
@@ -250,8 +270,10 @@ extension TFLiteVisionInterpreter {
             self.inputRankType = inputRankType
             self.isGrayScale = isGrayScale
             self.normalization = normalization
+            self.cropType = cropType
         }
     }
+    
 }
 
 extension TFLiteVisionInterpreter {
@@ -267,17 +289,3 @@ extension TFLiteVisionInterpreter {
         static let channel = 3 // rgb: 3, gray: 1
     }
 }
-
-public struct PreprocessOptions {
-    let cropArea: CropArea
-    
-    public init(cropArea: CropArea) {
-        self.cropArea = cropArea
-    }
-    
-    public enum CropArea {
-        case customAspectFill(rect: CGRect)
-        case squareAspectFill
-    }
-}
-
