@@ -35,6 +35,7 @@
 		A3026AB6AC3DD1C4322FA778 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Example.release.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Example/Pods-TFLiteSwift-Vision_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C43C991E26D2241600742E3A /* mobilenet_v2_1.0_224.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = mobilenet_v2_1.0_224.tflite; sourceTree = "<group>"; };
 		C43C992026D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels_mobilenet_quant_v1_224.txt; sourceTree = "<group>"; };
+		C4E470C726E144390079FF0A /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = .travis.yml; path = ../.travis.yml; sourceTree = "<group>"; };
 		E573F9A6B9AF4BD9A6AD6A59 /* Pods-TFLiteSwift-Vision_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Tests.release.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Tests/Pods-TFLiteSwift-Vision_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -99,6 +100,7 @@
 				44D3BDBA25556F0759676B6E /* TFLiteSwift-Vision.podspec */,
 				39F25EF41E85A7BB3D92CBD5 /* README.md */,
 				3D6B6EBA6A37B612D03B3E16 /* LICENSE */,
+				C4E470C726E144390079FF0A /* .travis.yml */,
 			);
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
