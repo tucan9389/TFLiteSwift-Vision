@@ -5,9 +5,9 @@ platform :ios, '10.0'
 target 'TFLiteSwift-Vision_Example' do
   pod 'TFLiteSwift-Vision', :path => '../'
 
-  target 'TFLiteSwift-Vision_Tests' do
-    inherit! :search_paths
-
-    
-  end
+#  target 'TFLiteSwift-Vision_Tests' do
+#    inherit! :search_paths
+#
+#    
+#  end
 end
