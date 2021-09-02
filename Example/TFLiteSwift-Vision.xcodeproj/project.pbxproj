@@ -7,35 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		37A56BD19840B4D69E0A7977 /* Pods_TFLiteSwift_Vision_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44B101D2A08F814CE06E9890 /* Pods_TFLiteSwift_Vision_Tests.framework */; };
+		2AB2D48DBE75772F861DDFDD /* Pods_TFLiteSwift_Vision_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28BFE363206A9E852E381C52 /* Pods_TFLiteSwift_Vision_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
-		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
-		998D214DDEFD6E2013C4D830 /* Pods_TFLiteSwift_Vision_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4CE55937B3F135EB0359872 /* Pods_TFLiteSwift_Vision_Example.framework */; };
 		C43C991F26D2241600742E3A /* mobilenet_v2_1.0_224.tflite in Resources */ = {isa = PBXBuildFile; fileRef = C43C991E26D2241600742E3A /* mobilenet_v2_1.0_224.tflite */; };
 		C43C992126D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt in Resources */ = {isa = PBXBuildFile; fileRef = C43C992026D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		607FACE61AFB9204008FA782 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 607FACC81AFB9204008FA782 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 607FACCF1AFB9204008FA782;
-			remoteInfo = "TFLiteSwift-Vision";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
+		12829886A0B27BC64B38471D /* Pods-TFLiteSwift-Vision_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Example.debug.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Example/Pods-TFLiteSwift-Vision_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		1CFC4BC94196A048E9BBE0CA /* Pods_TFLiteSwift_Vision_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFLiteSwift_Vision_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		28BFE363206A9E852E381C52 /* Pods_TFLiteSwift_Vision_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFLiteSwift_Vision_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		39F25EF41E85A7BB3D92CBD5 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		3D6B6EBA6A37B612D03B3E16 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		42155B139BB805EF5AEB62F1 /* Pods-TFLiteSwift-Vision_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Tests.release.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Tests/Pods-TFLiteSwift-Vision_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		44B101D2A08F814CE06E9890 /* Pods_TFLiteSwift_Vision_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFLiteSwift_Vision_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		44D3BDBA25556F0759676B6E /* TFLiteSwift-Vision.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = "TFLiteSwift-Vision.podspec"; path = "../TFLiteSwift-Vision.podspec"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		46BFD34785B29F0AC0B54B7B /* Pods-TFLiteSwift-Vision_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Example.debug.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Example/Pods-TFLiteSwift-Vision_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* TFLiteSwift-Vision_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TFLiteSwift-Vision_Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -43,14 +31,11 @@
 		607FACDA1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		607FACE51AFB9204008FA782 /* TFLiteSwift-Vision_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TFLiteSwift-Vision_Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
-		75B127ADDC692C402A4048FC /* Pods-TFLiteSwift-Vision_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Tests.debug.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Tests/Pods-TFLiteSwift-Vision_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		B4CE55937B3F135EB0359872 /* Pods_TFLiteSwift_Vision_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TFLiteSwift_Vision_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6CA826DE0600E3764149C29A /* Pods-TFLiteSwift-Vision_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Tests.debug.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Tests/Pods-TFLiteSwift-Vision_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		A3026AB6AC3DD1C4322FA778 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Example.release.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Example/Pods-TFLiteSwift-Vision_Example.release.xcconfig"; sourceTree = "<group>"; };
 		C43C991E26D2241600742E3A /* mobilenet_v2_1.0_224.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = mobilenet_v2_1.0_224.tflite; sourceTree = "<group>"; };
 		C43C992026D2241A00742E3A /* labels_mobilenet_quant_v1_224.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels_mobilenet_quant_v1_224.txt; sourceTree = "<group>"; };
-		C8B95A5E9727EAB9337E31C1 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Example.release.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Example/Pods-TFLiteSwift-Vision_Example.release.xcconfig"; sourceTree = "<group>"; };
+		E573F9A6B9AF4BD9A6AD6A59 /* Pods-TFLiteSwift-Vision_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TFLiteSwift-Vision_Tests.release.xcconfig"; path = "Target Support Files/Pods-TFLiteSwift-Vision_Tests/Pods-TFLiteSwift-Vision_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,15 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				998D214DDEFD6E2013C4D830 /* Pods_TFLiteSwift_Vision_Example.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		607FACE21AFB9204008FA782 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				37A56BD19840B4D69E0A7977 /* Pods_TFLiteSwift_Vision_Tests.framework in Frameworks */,
+				2AB2D48DBE75772F861DDFDD /* Pods_TFLiteSwift_Vision_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,10 +55,9 @@
 			children = (
 				607FACF51AFB993E008FA782 /* Podspec Metadata */,
 				607FACD21AFB9204008FA782 /* Example for TFLiteSwift-Vision */,
-				607FACE81AFB9204008FA782 /* Tests */,
 				607FACD11AFB9204008FA782 /* Products */,
 				C366FFC8EDA03264163A9B12 /* Pods */,
-				9C44DF2620D8A9B2B6E1EF6F /* Frameworks */,
+				9B0EC7E4AD77CBCE732318C1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -89,7 +65,6 @@
 			isa = PBXGroup;
 			children = (
 				607FACD01AFB9204008FA782 /* TFLiteSwift-Vision_Example.app */,
-				607FACE51AFB9204008FA782 /* TFLiteSwift-Vision_Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -118,23 +93,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		607FACE81AFB9204008FA782 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				607FACEB1AFB9204008FA782 /* Tests.swift */,
-				607FACE91AFB9204008FA782 /* Supporting Files */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		607FACE91AFB9204008FA782 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				607FACEA1AFB9204008FA782 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		607FACF51AFB993E008FA782 /* Podspec Metadata */ = {
 			isa = PBXGroup;
 			children = (
@@ -145,11 +103,11 @@
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
 		};
-		9C44DF2620D8A9B2B6E1EF6F /* Frameworks */ = {
+		9B0EC7E4AD77CBCE732318C1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B4CE55937B3F135EB0359872 /* Pods_TFLiteSwift_Vision_Example.framework */,
-				44B101D2A08F814CE06E9890 /* Pods_TFLiteSwift_Vision_Tests.framework */,
+				28BFE363206A9E852E381C52 /* Pods_TFLiteSwift_Vision_Example.framework */,
+				1CFC4BC94196A048E9BBE0CA /* Pods_TFLiteSwift_Vision_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -157,10 +115,10 @@
 		C366FFC8EDA03264163A9B12 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				46BFD34785B29F0AC0B54B7B /* Pods-TFLiteSwift-Vision_Example.debug.xcconfig */,
-				C8B95A5E9727EAB9337E31C1 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */,
-				75B127ADDC692C402A4048FC /* Pods-TFLiteSwift-Vision_Tests.debug.xcconfig */,
-				42155B139BB805EF5AEB62F1 /* Pods-TFLiteSwift-Vision_Tests.release.xcconfig */,
+				12829886A0B27BC64B38471D /* Pods-TFLiteSwift-Vision_Example.debug.xcconfig */,
+				A3026AB6AC3DD1C4322FA778 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */,
+				6CA826DE0600E3764149C29A /* Pods-TFLiteSwift-Vision_Tests.debug.xcconfig */,
+				E573F9A6B9AF4BD9A6AD6A59 /* Pods-TFLiteSwift-Vision_Tests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -172,7 +130,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 607FACEF1AFB9204008FA782 /* Build configuration list for PBXNativeTarget "TFLiteSwift-Vision_Example" */;
 			buildPhases = (
-				BAF9D1AD7CAA90C137750040 /* [CP] Check Pods Manifest.lock */,
+				1604F8A55FD9FD5D40A07F1F /* [CP] Check Pods Manifest.lock */,
 				607FACCC1AFB9204008FA782 /* Sources */,
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
@@ -185,25 +143,6 @@
 			productName = "TFLiteSwift-Vision";
 			productReference = 607FACD01AFB9204008FA782 /* TFLiteSwift-Vision_Example.app */;
 			productType = "com.apple.product-type.application";
-		};
-		607FACE41AFB9204008FA782 /* TFLiteSwift-Vision_Tests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "TFLiteSwift-Vision_Tests" */;
-			buildPhases = (
-				1ACA93D9ADD729DD16C55CA7 /* [CP] Check Pods Manifest.lock */,
-				607FACE11AFB9204008FA782 /* Sources */,
-				607FACE21AFB9204008FA782 /* Frameworks */,
-				607FACE31AFB9204008FA782 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				607FACE71AFB9204008FA782 /* PBXTargetDependency */,
-			);
-			name = "TFLiteSwift-Vision_Tests";
-			productName = Tests;
-			productReference = 607FACE51AFB9204008FA782 /* TFLiteSwift-Vision_Tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -219,12 +158,6 @@
 						CreatedOnToolsVersion = 6.3.1;
 						DevelopmentTeam = 5WXJ4Z4H69;
 						LastSwiftMigration = 0900;
-					};
-					607FACE41AFB9204008FA782 = {
-						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = 5WXJ4Z4H69;
-						LastSwiftMigration = 0900;
-						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
 				};
 			};
@@ -243,7 +176,6 @@
 			projectRoot = "";
 			targets = (
 				607FACCF1AFB9204008FA782 /* TFLiteSwift-Vision_Example */,
-				607FACE41AFB9204008FA782 /* TFLiteSwift-Vision_Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -261,39 +193,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		607FACE31AFB9204008FA782 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1ACA93D9ADD729DD16C55CA7 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-TFLiteSwift-Vision_Tests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BAF9D1AD7CAA90C137750040 /* [CP] Check Pods Manifest.lock */ = {
+		1604F8A55FD9FD5D40A07F1F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -327,23 +230,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		607FACE11AFB9204008FA782 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		607FACE71AFB9204008FA782 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 607FACCF1AFB9204008FA782 /* TFLiteSwift-Vision_Example */;
-			targetProxy = 607FACE61AFB9204008FA782 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		607FACD91AFB9204008FA782 /* Main.storyboard */ = {
@@ -395,6 +282,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXCLUDED_ARCHS = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -448,6 +336,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXCLUDED_ARCHS = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -466,7 +355,7 @@
 		};
 		607FACF01AFB9204008FA782 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 46BFD34785B29F0AC0B54B7B /* Pods-TFLiteSwift-Vision_Example.debug.xcconfig */;
+			baseConfigurationReference = 12829886A0B27BC64B38471D /* Pods-TFLiteSwift-Vision_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 5WXJ4Z4H69;
@@ -478,12 +367,13 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				VALIDATE_WORKSPACE = NO;
 			};
 			name = Debug;
 		};
 		607FACF11AFB9204008FA782 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C8B95A5E9727EAB9337E31C1 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */;
+			baseConfigurationReference = A3026AB6AC3DD1C4322FA778 /* Pods-TFLiteSwift-Vision_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 5WXJ4Z4H69;
@@ -491,52 +381,12 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
-			};
-			name = Release;
-		};
-		607FACF31AFB9204008FA782 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 75B127ADDC692C402A4048FC /* Pods-TFLiteSwift-Vision_Tests.debug.xcconfig */;
-			buildSettings = {
-				DEVELOPMENT_TEAM = 5WXJ4Z4H69;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TFLiteSwift-Vision_Example.app/TFLiteSwift-Vision_Example";
-			};
-			name = Debug;
-		};
-		607FACF41AFB9204008FA782 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 42155B139BB805EF5AEB62F1 /* Pods-TFLiteSwift-Vision_Tests.release.xcconfig */;
-			buildSettings = {
-				DEVELOPMENT_TEAM = 5WXJ4Z4H69;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TFLiteSwift-Vision_Example.app/TFLiteSwift-Vision_Example";
+				VALIDATE_WORKSPACE = NO;
 			};
 			name = Release;
 		};
@@ -557,15 +407,6 @@
 			buildConfigurations = (
 				607FACF01AFB9204008FA782 /* Debug */,
 				607FACF11AFB9204008FA782 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "TFLiteSwift-Vision_Tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				607FACF31AFB9204008FA782 /* Debug */,
-				607FACF41AFB9204008FA782 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
