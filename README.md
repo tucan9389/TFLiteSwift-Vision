@@ -129,11 +129,11 @@ After build and run the project, you can test the model(`mobilenet_v2_1.0_224.tf
 TFLiteSwift-Vision is supporting (or wants to support) follow functions:
 
 - Preprocessing (convert Cocoa's image type to TFLiteSwift's Tensor)
-  - Supporting Cocoa image type:
-    - [x] UIImage → Data
-    - [ ] CVPixelBuffer → Data
-    - [ ] CGImage → Data
-    - [ ] MTLTexture → Data
+  - Supporting input image type:
+    - [x] UIImage
+    - [x] CVPixelBuffer
+    - [ ] CGImage
+    - [ ] MTLTexture
   - Supporing bhwc sequence:
     - [x] bwhc (normally used in TF)
     - [x] bcwh (noramlly used in Pytorch)
