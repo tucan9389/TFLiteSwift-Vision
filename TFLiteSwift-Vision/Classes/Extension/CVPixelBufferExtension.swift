@@ -193,7 +193,7 @@ extension CVPixelBuffer {
         
         let width = CVPixelBufferGetWidth(self)
         let height = CVPixelBufferGetHeight(self)
-        let bytesPerRow = CVPixelBufferGetBytesPerRow(self)
+        let _ = CVPixelBufferGetBytesPerRow(self)
         
         let buffer = baseAddress.assumingMemoryBound(to: UInt8.self)
         var imageBytes: [UInt8] = [UInt8](repeating: 0, count: width * height)

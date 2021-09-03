@@ -21,7 +21,7 @@ public enum TFLiteVisionInput {
     }
     var uiImage: UIImage? {
         switch self {
-        case .pixelBuffer(let pixelBuffer):
+        case .pixelBuffer(_):
             return nil
         case .uiImage(let uiImage):
             return uiImage
