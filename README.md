@@ -137,14 +137,15 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - Supporing bhwc sequence:
     - [x] bwhc (normally used in TF)
     - [x] bcwh (noramlly used in Pytorch)
+    - [x] bwh (for gray image)
+    - [x] bhw (for gray image)
     - [ ] whc
     - [ ] hwc
-    - [ ] bwh (for grayscale input)
-    - [ ] wh (for grayscale input)
+    - [ ] wh (for gray input)
   - Supporting normalization methods:
     - [x] Normalization with scaling (0...255 → 0.0...1.0)
     - [x] Normalization with mean and std (normaly used in pytorch and it is used in ImageNet firstly)
-    - [ ] Grayscaling (not to 4 dim tensor, but to 3 dim tensor from an image)
+    - [x] Grayscaling (not to 4 dim tensor, but to 3 dim tensor from an image)
   - Supporting cropping methods:
     - [x] Resizing (`vImageScale_ARGB8888`)
     - [ ] Centercropping
@@ -153,9 +154,6 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - Supporting input type
     - [x] Float32
     - [x] UInt8
-  - [ ] Support quantization
-    - [ ] Float16
-    - [ ] UInt8
 - Inferenceing
   - batch size
     - [x] 1 batch
