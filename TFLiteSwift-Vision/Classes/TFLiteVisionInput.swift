@@ -19,6 +19,14 @@ public enum TFLiteVisionInput {
             return uiImage.pixelBufferFromImage()
         }
     }
+    var uiImage: UIImage? {
+        switch self {
+        case .pixelBuffer(let pixelBuffer):
+            return nil
+        case .uiImage(let uiImage):
+            return uiImage
+        }
+    }
     
     var imageSize: CGSize {
         switch self {
@@ -50,5 +58,10 @@ public enum TFLiteVisionInput {
         let targetSize = targetSize(cropType: cropType)
         // Resize `targetSize` of input image to `modelSize`.
         return pixelBuffer.resize(from: targetSize, to: inputModelSize)
+    }
+    
+    func resizedUIImage(with inputModelSize: CGSize) -> UIImage? {
+        guard let uiImage = uiImage else { return nil }
+        return uiImage.resized(targetSize: inputModelSize)
     }
 }

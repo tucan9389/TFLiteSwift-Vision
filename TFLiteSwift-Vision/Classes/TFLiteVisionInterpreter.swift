@@ -45,6 +45,10 @@ public class TFLiteVisionInterpreter {
             return inputTensor?.shape.dimensions[2]
         case .bcwh:
             return inputTensor?.shape.dimensions[2]
+        case .bhw:
+            return inputTensor?.shape.dimensions[2]
+        case .bwh:
+            return inputTensor?.shape.dimensions[1]
         }
     }
     
@@ -58,7 +62,30 @@ public class TFLiteVisionInterpreter {
             return inputTensor?.shape.dimensions[1]
         case .bcwh:
             return inputTensor?.shape.dimensions[3]
+        case .bhw:
+            return inputTensor?.shape.dimensions[1]
+        case .bwh:
+            return inputTensor?.shape.dimensions[2]
         }
+    }
+    
+    public var inputChannel: Int? {
+        switch options.inputRankType {
+        case .bwhc:
+            return inputTensor?.shape.dimensions[3]
+        case .bchw:
+            return inputTensor?.shape.dimensions[1]
+        case .bhwc:
+            return inputTensor?.shape.dimensions[3]
+        case .bcwh:
+            return inputTensor?.shape.dimensions[1]
+        case .bhw, .bwh:
+            return 1
+        }
+    }
+    
+    public var isGrayImage: Bool {
+        return inputChannel == 1
     }
     
     public init(options: Options) {
@@ -136,27 +163,46 @@ public class TFLiteVisionInterpreter {
     }
     
     public func preprocess(with input: TFLiteVisionInput) -> Data? {
-        guard let inputWidth = inputWidth, let inputHeight = inputHeight else { return nil }
+        guard let inputWidth = inputWidth, let inputHeight = inputHeight, let inputChannel = inputChannel else { return nil }
         
-        let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
-        guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize, and: options.cropType) else { return nil }
-        
-        // Remove the alpha component from the image buffer to get the initialized `Data`.
-        let byteCount = 1 * inputHeight * inputWidth * options.inputChannel
-        let inputDataType = inputTensor?.dataType ?? .float32
-        guard let inputData = thumbnail.rgbData(byteCount: byteCount,
-                                                normalization: options.normalization,
-                                                isModelQuantized: options.isQuantized,
-                                                dataType: inputDataType) else {
-            print("Failed to convert the image buffer to RGB data.")
+        if inputChannel == 3 {
+            let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
+            guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize, and: options.cropType) else { return nil }
+            
+            // Remove the alpha component from the image buffer to get the initialized `Data`.
+            // let byteCount = 1 * inputHeight * inputWidth * inputChannel
+            
+            let inputDataType = inputTensor?.dataType ?? .float32
+            guard let inputData = thumbnail.rgbData(normalization: options.normalization,
+                                                    isModelQuantized: options.isQuantized,
+                                                    dataType: inputDataType)
+            else {
+                print("Failed to convert the image buffer to data.")
+                return nil
+            }
+                                              
+            return inputData
+        } else if inputChannel == 1 {
+            let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
+            guard let thumbnail = input.resizedUIImage(with: modelInputSize) else { return nil }
+            
+            let inputDataType = inputTensor?.dataType ?? .float32
+            guard let inputData = thumbnail.grayData(normalization: options.normalization,
+                                                     isModelQuantized: options.isQuantized,
+                                                     dataType: inputDataType)
+            else {
+                print("Failed to convert the image buffer to data.")
+                return nil
+            }
+                                              
+            return inputData
+        } else {
             return nil
         }
-        
-        return inputData
     }
     
     public func preprocess(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect) -> Data? {
-        guard let inputWidth = inputWidth, let inputHeight = inputHeight else { return nil }
+        guard let inputWidth = inputWidth, let inputHeight = inputHeight, let inputChannel = inputChannel else { return nil }
         
         let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
         assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
@@ -166,12 +212,18 @@ public class TFLiteVisionInterpreter {
         guard let thumbnail = pixelBuffer.resize(from: targetSquare, to: modelSize) else { return nil }
         
         // Remove the alpha component from the image buffer to get the initialized `Data`.
-        let byteCount = 1 * inputHeight * inputWidth * options.inputChannel
-        guard let inputData = thumbnail.rgbData(byteCount: byteCount,
-                                                normalization: options.normalization,
-                                                isModelQuantized: options.isQuantized) else {
-            print("Failed to convert the image buffer to RGB data.")
-            return nil
+        // let byteCount = 1 * inputHeight * inputWidth * inputChannel
+        
+        let inputData: Data?
+        if inputChannel == 3 {
+            inputData = thumbnail.rgbData(normalization: options.normalization,
+                                          isModelQuantized: options.isQuantized)
+        } else if inputChannel == 1 {
+            inputData = thumbnail.grayData(normalization: options.normalization,
+                                           isModelQuantized: options.isQuantized)
+        } else {
+            print("Failed to convert the image buffer to data.")
+            inputData = nil
         }
         
         return inputData
@@ -242,6 +294,8 @@ extension TFLiteVisionInterpreter {
         case bwhc
         case bcwh // usually pytorch model
         case bchw
+        case bhw  // only gray image
+        case bwh  // only gray image
     }
     
     public enum CropType {
@@ -256,8 +310,6 @@ extension TFLiteVisionInterpreter {
         let isQuantized: Bool
         
         let inputRankType: RankType
-        let isGrayScale: Bool
-        var inputChannel: Int { return isGrayScale ? 1 : 3 }
         
         let normalization: NormalizationOptions
         let cropType: CropType
@@ -281,7 +333,6 @@ extension TFLiteVisionInterpreter {
             #endif
             self.isQuantized = isQuantized
             self.inputRankType = inputRankType
-            self.isGrayScale = isGrayScale
             self.normalization = normalization
             self.cropType = cropType
         }
