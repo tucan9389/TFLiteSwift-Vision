@@ -50,11 +50,11 @@ public class TFLiteFlatArray<Element: AdditiveArithmetic> {
         return result
     }
     
-    func element(at indexes: [Int]) -> Element {
+    public func element(at indexes: [Int]) -> Element {
         return array[flatIndex(indexes)]
     }
     
-    subscript(indexes: Int...) -> Element {
+    public subscript(indexes: Int...) -> Element {
         get { return array[flatIndex(indexes)] }
         set { array[flatIndex(indexes)] = newValue }
     }
