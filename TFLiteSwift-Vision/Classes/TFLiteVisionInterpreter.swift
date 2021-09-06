@@ -35,7 +35,7 @@ public class TFLiteVisionInterpreter {
     var inputTensor: Tensor?
     var outputTensors: [Tensor] = []
     
-    var inputWidth: Int? {
+    public var inputWidth: Int? {
         switch options.inputRankType {
         case .bwhc:
             return inputTensor?.shape.dimensions[1]
@@ -48,7 +48,7 @@ public class TFLiteVisionInterpreter {
         }
     }
     
-    var inputHeight: Int? {
+    public var inputHeight: Int? {
         switch options.inputRankType {
         case .bwhc:
             return inputTensor?.shape.dimensions[2]
@@ -119,6 +119,11 @@ public class TFLiteVisionInterpreter {
 
         self.inputTensor = inputTensor
         
+        print("------------------------------------------------------")
+        print("inputTensor.shape.dimensions:", inputTensor.shape.dimensions)
+        print("inputTensor.dataType:", inputTensor.dataType)
+        print("------------------------------------------------------")
+        
         try interpreter.invoke()
         
         // output tensor
@@ -126,14 +131,8 @@ public class TFLiteVisionInterpreter {
             let outputTensor = try interpreter.output(at: outputTensorIndex)
             return outputTensor
         }
-        // check output tensors dimension
-        outputTensors.enumerated().forEach { (offset, outputTensor) in
-            // <#TODO#>
-        }
         
         self.outputTensors = outputTensors
-        
-        // <#TODO#> - check quantization or not
     }
     
     public func preprocess(with input: TFLiteVisionInput) -> Data? {
@@ -198,7 +197,7 @@ public class TFLiteVisionInterpreter {
         return outputTensors.map { TFLiteFlatArray(tensor: $0) }
     }
     
-    public func inference(with uiImage: UIImage) -> TFLiteFlatArray<Float32>? {
+    public func inference(with uiImage: UIImage) -> [TFLiteFlatArray<Float32>]? {
         let input: TFLiteVisionInput = .uiImage(uiImage: uiImage)
         
         // preprocess
@@ -206,10 +205,24 @@ public class TFLiteVisionInterpreter {
             else { fatalError("Cannot preprcess") }
         
         // inference
-        guard let output: TFLiteFlatArray<Float32> = inference(with: inputData)?.first
+        guard let outputs: [TFLiteFlatArray<Float32>] = inference(with: inputData)
             else { fatalError("Cannot inference") }
         
-        return output
+        return outputs
+    }
+    
+    public func inference(with pixelBuffer: CVPixelBuffer) -> [TFLiteFlatArray<Float32>]? {
+        let input: TFLiteVisionInput = .pixelBuffer(pixelBuffer: pixelBuffer)
+        
+        // preprocess
+        guard let inputData: Data = preprocess(with: input)
+            else { fatalError("Cannot preprcess") }
+        
+        // inference
+        guard let outputs: [TFLiteFlatArray<Float32>] = inference(with: inputData)
+            else { fatalError("Cannot inference") }
+        
+        return outputs
     }
 }
 
@@ -219,7 +232,7 @@ extension TFLiteVisionInterpreter {
         case scaled(from: Float, to: Float)
         case meanStd(mean: [Float], std: [Float])
         
-        static var pytorchNormalization: NormalizationOptions {
+        public static var pytorchNormalization: NormalizationOptions {
             return .meanStd(mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225])
         }
     }
