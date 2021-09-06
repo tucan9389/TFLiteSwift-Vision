@@ -23,6 +23,7 @@
 //
 
 import UIKit
+import TensorFlowLite
 
 extension UIImage {
     func pixelBufferFromImage() -> CVPixelBuffer {
@@ -72,6 +73,75 @@ extension UIImage {
         _ = CVPixelBufferUnlockBaseAddress(pxbuffer!, CVPixelBufferLockFlags(rawValue: 0));
         return pxbuffer!;
     }
+    
+    func resized(targetSize: CGSize) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
+        self.draw(in: CGRect(origin: .zero, size: targetSize))
+        let toConvertImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        return toConvertImage
+    }
+    
+    func grayData(
+        normalization: TFLiteVisionInterpreter.NormalizationOptions = .none,
+        isModelQuantized: Bool,
+        dataType: Tensor.DataType = .float32) -> Data? {
+        
+        let width = Int(size.width)
+        let height = Int(size.height)
+
+        let pixels = UnsafeMutablePointer<UInt32>.allocate(capacity: width * height * MemoryLayout<UInt32>.size)
+        defer {
+            pixels.deallocate()
+        }
+        memset(pixels, 0, width * height * MemoryLayout<UInt32>.size)
+        
+        let bitmapInfo: CGBitmapInfo = [.byteOrder32Little, CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)]
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+
+        let context = CGContext(data: pixels, width: width, height: height,
+                                bitsPerComponent: 8,
+                                bytesPerRow: width * MemoryLayout<UInt32>.size,
+                                space: colorSpace,
+                                bitmapInfo: bitmapInfo.rawValue)
+
+        context?.draw(cgImage!, in: CGRect(x: 0, y: 0, width: 28, height: 28))
+
+        let imageBytes: [UInt8] = (0..<(height * width)).map { i in
+            let pixel = pixels[i].toUInt8s()
+            return UInt8(Float(pixel[0]) * 0.3 + Float(pixel[1]) * 0.59 + Float(pixel[2]) * 0.11)
+        }
+        
+        switch dataType {
+        case .uInt8:
+            return Data(copyingBufferOf: imageBytes)
+        case .float32:
+            switch normalization {
+            case .none:
+                return Data(copyingBufferOf: imageBytes.map { Float($0) })
+            case .scaled(from: let from, to: let to):
+                return Data(copyingBufferOf: imageBytes.map { element -> Float in ((Float(element) * (1.0 / 255.0)) * (to - from)) + from })
+            case .meanStd(mean: let mean, std: let std):
+                var bytes = imageBytes.map { Float($0) } // normalization
+                for i in 0 ..< width * height {
+                    bytes[width * height * 0 + i] = (Float32(imageBytes[i * 1 + 0]) - mean[0]) / std[0] // Gray
+                }
+                return Data(copyingBufferOf: bytes)
+            }
+        default:
+            fatalError("don't support the type: \(dataType)")
+        }
+        
+//        for y in 0..<height {
+//            for x in 0..<width {
+//                let pixel = pixels[y * width + x].toUInt8s()
+//                let grayed = Float(pixel[0]) * 0.3 + Float(pixel[1]) * 0.59 + Float(pixel[2]) * 0.11
+//                array.append(grayed / 255)
+//            }
+//        }
+//
+//        return Data(copyingBufferOf: array)
+    }
 }
 
 extension UIView {
@@ -80,5 +150,18 @@ extension UIView {
         return renderer.image { rendererContext in
             layer.render(in: rendererContext.cgContext)
         }
+    }
+}
+
+extension UInt32 {
+    func toUInt8s() -> [UInt8] {
+        var bigEndian = self.bigEndian
+        let count = MemoryLayout<UInt32>.size
+        let bytePtr = withUnsafePointer(to: &bigEndian) {
+            $0.withMemoryRebound(to: UInt8.self, capacity: count) {
+                UnsafeBufferPointer(start: $0, count: count)
+            }
+        }
+        return Array(bytePtr)
     }
 }

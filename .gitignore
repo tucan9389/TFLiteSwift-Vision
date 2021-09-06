@@ -45,3 +45,5 @@ build
 *.tflite
 
 Example/TFLiteSwift-Vision/labels_mobilenet_quant_v1_224.txt
+
+tfhub-parser/*

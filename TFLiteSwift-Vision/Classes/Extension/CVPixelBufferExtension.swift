@@ -106,17 +106,10 @@ extension CVPixelBuffer {
         return result
     }
     
-    /// Returns the RGB `Data` representation of the given image buffer with the specified
-    /// `byteCount`.
-    ///
-    /// - Parameters:
-    ///   - byteCount: The expected byte count for the RGB data calculated using the values that the
-    ///       model was trained on: `batchSize * imageWidth * imageHeight * componentsCount`.
-    ///   - isModelQuantized: Whether the model is quantized (i.e. fixed point values rather than
-    ///       floating point values).
-    /// - Returns: The RGB data representation of the image buffer or `nil` if the buffer could not be
-    ///     converted.
-    func rgbData(byteCount: Int, normalization: TFLiteVisionInterpreter.NormalizationOptions = .none, isModelQuantized: Bool, dataType: Tensor.DataType = .float32) -> Data? {
+    func rgbData(
+        normalization: TFLiteVisionInterpreter.NormalizationOptions = .none,
+        isModelQuantized: Bool,
+        dataType: Tensor.DataType = .float32) -> Data? {
         CVPixelBufferLockBaseAddress(self, .readOnly)
         defer { CVPixelBufferUnlockBaseAddress(self, .readOnly) }
         guard let sourceData = CVPixelBufferGetBaseAddress(self) else {
@@ -182,6 +175,43 @@ extension CVPixelBuffer {
                     bytes[width * height * 0 + i] = (Float32(imageBytes[i * 3 + 0]) - mean[0]) / std[0] // R
                     bytes[width * height * 1 + i] = (Float32(imageBytes[i * 3 + 1]) - mean[1]) / std[1] // G
                     bytes[width * height * 2 + i] = (Float32(imageBytes[i * 3 + 2]) - mean[2]) / std[2] // B
+                }
+                return Data(copyingBufferOf: bytes)
+            }
+        default:
+            fatalError("don't support the type: \(dataType)")
+        }
+    }
+    
+    func grayData(
+        normalization: TFLiteVisionInterpreter.NormalizationOptions = .none,
+        isModelQuantized: Bool,
+        dataType: Tensor.DataType = .float32) -> Data? {
+        CVPixelBufferLockBaseAddress(self, .readOnly)
+        defer { CVPixelBufferUnlockBaseAddress(self, .readOnly) }
+        guard let baseAddress = CVPixelBufferGetBaseAddress(self) else { return nil }
+        
+        let width = CVPixelBufferGetWidth(self)
+        let height = CVPixelBufferGetHeight(self)
+        let _ = CVPixelBufferGetBytesPerRow(self)
+        
+        let buffer = baseAddress.assumingMemoryBound(to: UInt8.self)
+        var imageBytes: [UInt8] = [UInt8](repeating: 0, count: width * height)
+        imageBytes = imageBytes.enumerated().map { buffer[$0.offset] }
+        
+        switch dataType {
+        case .uInt8:
+            return Data(copyingBufferOf: imageBytes)
+        case .float32:
+            switch normalization {
+            case .none:
+                return Data(copyingBufferOf: imageBytes.map { Float($0) })
+            case .scaled(from: let from, to: let to):
+                return Data(copyingBufferOf: imageBytes.map { element -> Float in ((Float(element) * (1.0 / 255.0)) * (to - from)) + from })
+            case .meanStd(mean: let mean, std: let std):
+                var bytes = imageBytes.map { Float($0) } // normalization
+                for i in 0 ..< width * height {
+                    bytes[width * height * 0 + i] = (Float32(imageBytes[i * 1 + 0]) - mean[0]) / std[0] // Gray
                 }
                 return Data(copyingBufferOf: bytes)
             }
