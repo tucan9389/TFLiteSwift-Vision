@@ -7,6 +7,7 @@
 <!-- [![CI Status](https://img.shields.io/travis/tucan9389/TFLiteSwift-Vision.svg?style=flat)](https://travis-ci.org/tucan9389/TFLiteSwift-Vision) -->
 
 
+
 ## Table
 
 - [Goal](#goal)
@@ -170,7 +171,8 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
 
 ## Author
 
-tucan9389, tucan.dev@gmail.com
+- [@tucan9389](https://github.com/tucan9389), tucan.dev@gmail.com
+- [@Seonghun23](https://github.com/Seonghun23), kimsh777kr@gmail.com
 
 ## License
 
