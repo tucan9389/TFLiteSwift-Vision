@@ -39,7 +39,7 @@ extension CVPixelBuffer {
     ///   - from: Source area of image to be cropped and resized.
     ///   - to: Size to scale the image to(i.e. image size used while training the model).
     /// - Returns: The cropped and resized image of itself.
-    func resize(from source: CGRect, to size: CGSize) -> CVPixelBuffer? {
+    func resized(from source: CGRect, to size: CGSize) -> CVPixelBuffer? {
         let inputImageRowBytes = CVPixelBufferGetBytesPerRow(self)
         let imageChannels = 4
         
@@ -47,34 +47,33 @@ extension CVPixelBuffer {
         defer { CVPixelBufferUnlockBaseAddress(self, CVPixelBufferLockFlags(rawValue: 0)) }
         
         // Finds the address of the upper leftmost pixel of the source area.
-        guard
-            let inputBaseAddress = CVPixelBufferGetBaseAddress(self)?.advanced(
-                by: Int(source.minY) * inputImageRowBytes + Int(source.minX) * imageChannels)
-            else {
-                return nil
+        guard let baseAddress = CVPixelBufferGetBaseAddress(self)?
+                .advanced(by: Int(source.minY) * inputImageRowBytes + Int(source.minX) * imageChannels) else {
+            return nil
         }
+      
+        var sourceImage = vImage_Buffer(
+            data: baseAddress,
+            height: UInt(source.height),
+            width: UInt(source.width),
+            rowBytes: inputImageRowBytes
+        )
         
-        // Crops given area as vImage Buffer.
-        var croppedImage = vImage_Buffer(
-            data: inputBaseAddress, height: UInt(source.height), width: UInt(source.width),
-            rowBytes: inputImageRowBytes)
         
         let resultRowBytes = Int(size.width) * imageChannels
-        guard let resultAddress = malloc(Int(size.height) * resultRowBytes) else {
+        guard let baseAddress = malloc(Int(size.height) * resultRowBytes) else {
             return nil
         }
         
         // Allocates a vacant vImage buffer for resized image.
-        var resizedImage = vImage_Buffer(
-            data: resultAddress,
+        var distinationImage = vImage_Buffer(
+            data: baseAddress,
             height: UInt(size.height), width: UInt(size.width),
             rowBytes: resultRowBytes
         )
         
-        // Performs the scale operation on cropped image and stores it in result image buffer.
-        guard vImageScale_ARGB8888(&croppedImage, &resizedImage, nil, vImage_Flags(0)) == kvImageNoError
-            else {
-                return nil
+        guard vImageScale_ARGB8888(&sourceImage, &distinationImage, nil, vImage_Flags(0)) == kvImageNoError else {
+            return nil
         }
         
         let releaseCallBack: CVPixelBufferReleaseBytesCallback = { mutablePointer, pointer in
@@ -90,7 +89,7 @@ extension CVPixelBuffer {
             nil,
             Int(size.width), Int(size.height),
             CVPixelBufferGetPixelFormatType(self),
-            resultAddress,
+            baseAddress,
             resultRowBytes,
             releaseCallBack,
             nil,
@@ -99,7 +98,7 @@ extension CVPixelBuffer {
         )
         
         guard conversionStatus == kCVReturnSuccess else {
-            free(resultAddress)
+            free(baseAddress)
             return nil
         }
         
