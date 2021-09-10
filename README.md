@@ -148,7 +148,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [x] Grayscaling (not to 4 dim tensor, but to 3 dim tensor from an image)
   - Supporting cropping methods:
     - [x] Resizing (`vImageScale_ARGB8888`)
-    - [ ] Centercropping
+    - [x] Centercropping
     - [ ] Padding
     - If basic functions are implemented, need to optimize with Metal or Accelerate (or other domain specific frameworks)
   - Supporting input type
