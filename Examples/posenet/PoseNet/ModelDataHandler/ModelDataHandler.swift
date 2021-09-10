@@ -68,7 +68,7 @@ class ModelDataHandler {
     let postprocessingTime: TimeInterval
 
     inferenceStartTime = Date()
-    guard let outputs = try? interpreter.inference(with: pixelbuffer) else {
+    guard let outputs = try? interpreter.inference(with: pixelbuffer, from: source) else {
       os_log("Inference failed", type: .error)
       return nil
     }
