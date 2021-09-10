@@ -15,7 +15,7 @@
 import Accelerate
 import CoreImage
 import Foundation
-import TensorFlowLite
+import TFLiteSwift_Vision
 import UIKit
 
 /// This class handles all data preprocessing and makes calls to run inference on a given frame
@@ -24,13 +24,7 @@ class ModelDataHandler {
   // MARK: - Private Properties
 
   /// TensorFlow Lite `Interpreter` object for performing inference on a given model.
-  private var interpreter: Interpreter
-
-  /// TensorFlow lite `Tensor` of model input and output.
-  private var inputTensor: Tensor
-
-  private var heatsTensor: Tensor
-  private var offsetsTensor: Tensor
+  private var interpreter: TFLiteVisionInterpreter
 
   // MARK: - Initialization
 
@@ -38,78 +32,21 @@ class ModelDataHandler {
   /// successfully loaded from the app's main bundle. Default `threadCount` is 2.
   init(
     threadCount: Int = Constants.defaultThreadCount,
-    delegate: Delegates = Constants.defaultDelegate
+    accelerator: TFLiteVisionInterpreter.Accelerator = .cpu
   ) throws {
-    // Construct the path to the model file.
-    guard
-      let modelPath = Bundle.main.path(
-        forResource: Model.file.name,
-        ofType: Model.file.extension
-      )
-    else {
-      fatalError("Failed to load the model file with name: \(Model.file.name).")
-    }
-
-    // Specify the options for the `Interpreter`.
-    var options = Interpreter.Options()
-    options.threadCount = threadCount
-
-    // Specify the delegates for the `Interpreter`.
-    var delegates: [Delegate]?
-    switch delegate {
-    case .Metal:
-      delegates = [MetalDelegate()]
-    case .CoreML:
-      if let coreMLDelegate = CoreMLDelegate() {
-        delegates = [coreMLDelegate]
-      } else {
-        delegates = nil
-      }
-    default:
-      delegates = nil
-    }
-
-    // Create the `Interpreter`.
-    interpreter = try Interpreter(modelPath: modelPath, options: options, delegates: delegates)
-
-    // Initialize input and output `Tensor`s.
-    // Allocate memory for the model's input `Tensor`s.
-    try interpreter.allocateTensors()
-
-    // Get allocated input and output `Tensor`s.
-    inputTensor = try interpreter.input(at: 0)
-    heatsTensor = try interpreter.output(at: 0)
-    offsetsTensor = try interpreter.output(at: 1)
-
-    // Check if input and output `Tensor`s are in the expected formats.
-    guard (inputTensor.dataType == .uInt8) == Model.isQuantized else {
-      fatalError("Unexpected Model: quantization is \(!Model.isQuantized)")
-    }
-
-    guard inputTensor.shape.dimensions[0] == Model.input.batchSize,
-      inputTensor.shape.dimensions[1] == Model.input.height,
-      inputTensor.shape.dimensions[2] == Model.input.width,
-      inputTensor.shape.dimensions[3] == Model.input.channelSize
-    else {
-      fatalError("Unexpected Model: input shape")
-    }
-
-    guard heatsTensor.shape.dimensions[0] == Model.output.batchSize,
-      heatsTensor.shape.dimensions[1] == Model.output.height,
-      heatsTensor.shape.dimensions[2] == Model.output.width,
-      heatsTensor.shape.dimensions[3] == Model.output.keypointSize
-    else {
-      fatalError("Unexpected Model: heat tensor")
-    }
-
-    guard offsetsTensor.shape.dimensions[0] == Model.output.batchSize,
-      offsetsTensor.shape.dimensions[1] == Model.output.height,
-      offsetsTensor.shape.dimensions[2] == Model.output.width,
-      offsetsTensor.shape.dimensions[3] == Model.output.offsetSize
-    else {
-      fatalError("Unexpected Model: offset tensor")
-    }
-
+    
+    // Specify the options for the `TFLiteVisionInterpreter`.
+    let options = TFLiteVisionInterpreter.Options(
+      modelName: Model.file.name,
+      threadCount: threadCount,
+      accelerator: accelerator,
+      normalization: .scaled(from: 0.0, to: 1.0),
+      cropType: .scaleFill
+    )
+    
+    // Create the `TFLiteVisionInterpreter`.
+    interpreter = try TFLiteVisionInterpreter(options: options)
+    
   }
 
   /// Runs PoseNet model with given image with given source area to destination area.
@@ -123,79 +60,48 @@ class ModelDataHandler {
     -> (Result, Times)?
   {
     // Start times of each process.
-    let preprocessingStartTime: Date
     let inferenceStartTime: Date
     let postprocessingStartTime: Date
 
     // Processing times in milliseconds.
-    let preprocessingTime: TimeInterval
     let inferenceTime: TimeInterval
     let postprocessingTime: TimeInterval
 
-    preprocessingStartTime = Date()
-    guard let data = preprocess(of: pixelbuffer, from: source) else {
-      os_log("Preprocessing failed", type: .error)
+    inferenceStartTime = Date()
+    guard let outputs = try? interpreter.inference(with: pixelbuffer) else {
+      os_log("Inference failed", type: .error)
       return nil
     }
-    preprocessingTime = Date().timeIntervalSince(preprocessingStartTime) * 1000
-
-    inferenceStartTime = Date()
-    inference(from: data)
     inferenceTime = Date().timeIntervalSince(inferenceStartTime) * 1000
 
     postprocessingStartTime = Date()
-    guard let result = postprocess(to: dest) else {
+    guard let result = postprocess(outputs: outputs, to: dest) else {
       os_log("Postprocessing failed", type: .error)
       return nil
     }
     postprocessingTime = Date().timeIntervalSince(postprocessingStartTime) * 1000
 
     let times = Times(
-      preprocessing: preprocessingTime,
       inference: inferenceTime,
       postprocessing: postprocessingTime)
     return (result, times)
   }
 
   // MARK: - Private functions to run model
-  /// Preprocesses given rectangle image to be `Data` of desired size by cropping and resizing it.
-  ///
-  /// - Parameters:
-  ///   - of: Input image to crop and resize.
-  ///   - from: Target area to be cropped and resized.
-  /// - Returns: The cropped and resized image. `nil` if it can not be processed.
-  private func preprocess(of pixelBuffer: CVPixelBuffer, from targetSquare: CGRect) -> Data? {
-    let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
-    assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
-
-    // Resize `targetSquare` of input image to `modelSize`.
-    let modelSize = CGSize(width: Model.input.width, height: Model.input.height)
-    guard let thumbnail = pixelBuffer.resize(from: targetSquare, to: modelSize)
-    else {
-      return nil
-    }
-
-    // Remove the alpha component from the image buffer to get the initialized `Data`.
-    guard let inputData = thumbnail.rgbData(isModelQuantized: Model.isQuantized)
-    else {
-      os_log("Failed to convert the image buffer to RGB data.", type: .error)
-      return nil
-    }
-
-    return inputData
-  }
-
   /// Postprocesses output `Tensor`s to `Result` with size of view to render the result.
   ///
   /// - Parameters:
   ///   - to: Size of view to be displayed.
   /// - Returns: Postprocessed `Result`. `nil` if it can not be processed.
-  private func postprocess(to viewSize: CGSize) -> Result? {
+  private func postprocess(outputs: [TFLiteFlatArray<Float32>], to viewSize: CGSize) -> Result? {
+    guard let inputWidth = interpreter.inputWidth, let inputHeight = interpreter.inputHeight
+      else { return nil }
+    
     // MARK: Formats output tensors
     // Convert `Tensor` to `FlatArray`. As PoseNet is not quantized, convert them to Float type
     // `FlatArray`.
-    let heats = FlatArray<Float32>(tensor: heatsTensor)
-    let offsets = FlatArray<Float32>(tensor: offsetsTensor)
+    let heats = outputs[0]
+    let offsets = outputs[1]
 
     // MARK: Find position of each key point
     // Finds the (row, col) locations of where the keypoints are most likely to be. The highest
@@ -229,10 +135,10 @@ class ModelDataHandler {
     let coords = keypointPositions.enumerated().map { index, elem -> (y: Float32, x: Float32) in
       let (y, x) = elem
       let yCoord =
-        Float32(y) / Float32(Model.output.height - 1) * Float32(Model.input.height)
+        Float32(y) / Float32(Model.output.height - 1) * Float32(inputHeight)
         + offsets[0, y, x, index]
       let xCoord =
-        Float32(x) / Float32(Model.output.width - 1) * Float32(Model.input.width)
+        Float32(x) / Float32(Model.output.width - 1) * Float32(inputWidth)
         + offsets[0, y, x, index + Model.output.keypointSize]
       return (y: yCoord, x: xCoord)
     }
@@ -243,8 +149,8 @@ class ModelDataHandler {
     var bodyPartToDotMap = [BodyPart: CGPoint]()
     for (index, part) in BodyPart.allCases.enumerated() {
       let position = CGPoint(
-        x: CGFloat(coords[index].x) * viewSize.width / CGFloat(Model.input.width),
-        y: CGFloat(coords[index].y) * viewSize.height / CGFloat(Model.input.height)
+        x: CGFloat(coords[index].x) * viewSize.width / CGFloat(inputWidth),
+        y: CGFloat(coords[index].y) * viewSize.height / CGFloat(inputHeight)
       )
       bodyPartToDotMap[part] = position
       result.dots.append(position)
@@ -271,29 +177,6 @@ class ModelDataHandler {
     return result
   }
 
-  /// Run inference with given `Data`
-  ///
-  /// Parameter `from`: `Data` of input image to run model.
-  private func inference(from data: Data) {
-    // Copy the initialized `Data` to the input `Tensor`.
-    do {
-      try interpreter.copy(data, toInputAt: 0)
-
-      // Run inference by invoking the `Interpreter`.
-      try interpreter.invoke()
-
-      // Get the output `Tensor` to process the inference results.
-      heatsTensor = try interpreter.output(at: 0)
-      offsetsTensor = try interpreter.output(at: 1)
-
-    } catch let error {
-      os_log(
-        "Failed to invoke the interpreter with error: %s", type: .error,
-        error.localizedDescription)
-      return
-    }
-  }
-
   /// Returns value within [0,1].
   private func sigmoid(_ x: Float32) -> Float32 {
     return (1.0 / (1.0 + exp(-x)))
@@ -313,7 +196,6 @@ struct Line {
 }
 
 struct Times {
-  var preprocessing: Double
   var inference: Double
   var postprocessing: Double
 }
@@ -360,24 +242,6 @@ enum BodyPart: String, CaseIterable {
   ]
 }
 
-// MARK: - Delegates Enum
-enum Delegates: Int, CaseIterable {
-  case CPU
-  case Metal
-  case CoreML
-
-  var description: String {
-    switch self {
-    case .CPU:
-      return "CPU"
-    case .Metal:
-      return "GPU"
-    case .CoreML:
-      return "NPU"
-    }
-  }
-}
-
 // MARK: - Custom Errors
 enum PostprocessError: Error {
   case missingBodyPart(of: BodyPart)
@@ -391,7 +255,6 @@ enum Model {
     name: "posenet_mobilenet_v1_100_257x257_multi_kpt_stripped", extension: "tflite"
   )
 
-  static let input = (batchSize: 1, height: 257, width: 257, channelSize: 3)
   static let output = (batchSize: 1, height: 9, width: 9, keypointSize: 17, offsetSize: 34)
   static let isQuantized = false
 }
