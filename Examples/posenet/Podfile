@@ -6,7 +6,7 @@ target 'PoseNet' do
   use_frameworks!
 
   # Pods for PoseNet
-   pod 'TFLiteSwift-Vision', :path => '../../'
+   pod 'TFLiteSwift-Vision', '~> 0.2.4'
 end
 
 post_install do |installer|
