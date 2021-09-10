@@ -44,7 +44,7 @@ target 'MyXcodeProject' do
   use_frameworks!
 
   # Pods for Your Project
-  pod 'TFLiteSwift-Vision'
+  pod 'TFLiteSwift-Vision', '~> 0.2.3'
 
 end
 
@@ -53,6 +53,12 @@ post_install do |installer|
     config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
   end
 end
+```
+
+And then, run following:
+
+```shell
+pod install
 ```
 
 ### Add `.tflite` file in the Xcode Project
@@ -72,18 +78,19 @@ import TFLiteSwift_Vision
 Setup interpreter.
 
 ```swift
-var visionInterpreter = TFLiteVisionInterpreter(options: TFLiteVisionInterpreter.Options(
+let options = TFLiteVisionInterpreter.Options(
   modelName: "mobilenet_v2_1.0_224",
   inputRankType: .bwhc,
   normalization: .scaled(from: 0.0, to: 1.0)
-))
+)
+var visionInterpreter = try? TFLiteVisionInterpreter(options: options)
 ```
 
 Inference with an image. The following is an image classification case.
 
 ```swift
 // inference
-guard let output: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: uiImage)
+guard let output: [TFLiteFlatArray<Float32>] = try? self.visionInterpreter?.inference(with: uiImage)?.first
 	else { fatalError("Cannot inference") }
 
 // postprocess
