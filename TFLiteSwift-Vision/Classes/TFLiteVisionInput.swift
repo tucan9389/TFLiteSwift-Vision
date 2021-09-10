@@ -52,12 +52,12 @@ public enum TFLiteVisionInput {
         }
     }
     
-    func croppedPixelBuffer(with inputModelSize: CGSize, and cropType: TFLiteVisionInterpreter.CropType) -> CVPixelBuffer? {
+  func croppedPixelBuffer(with inputModelSize: CGSize, and cropType: TFLiteVisionInterpreter.CropType, from targetSquare: CGRect? = nil) -> CVPixelBuffer? {
         guard let pixelBuffer = pixelBuffer else { return nil }
         let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
         assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
         
-        let targetRect = targetRect(cropType: cropType)
+        let targetRect = targetSquare ?? targetRect(cropType: cropType)
         // Resize `targetSize` of input image to `modelSize`.
         return pixelBuffer.resized(from: targetRect, to: inputModelSize)
     }
