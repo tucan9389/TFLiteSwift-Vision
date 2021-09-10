@@ -37,7 +37,7 @@ public enum TFLiteVisionInput {
         }
     }
     
-    func targetSize(cropType: TFLiteVisionInterpreter.CropType) -> CGRect {
+    func targetRect(cropType: TFLiteVisionInterpreter.CropType) -> CGRect {
         switch cropType {
         case .customAspectFill(let rect):
             return rect
@@ -47,6 +47,8 @@ public enum TFLiteVisionInput {
             return CGRect(x: (size.width - minLength) / 2,
                           y: (size.height - minLength) / 2,
                           width: minLength, height: minLength)
+        case .scaleFill:
+            return CGRect(x: 0, y: 0, width: imageSize.width, height: imageSize.height)
         }
     }
     
@@ -55,9 +57,9 @@ public enum TFLiteVisionInput {
         let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
         assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
         
-        let targetSize = targetSize(cropType: cropType)
+        let targetRect = targetRect(cropType: cropType)
         // Resize `targetSize` of input image to `modelSize`.
-        return pixelBuffer.resize(from: targetSize, to: inputModelSize)
+        return pixelBuffer.resized(from: targetRect, to: inputModelSize)
     }
     
     func resizedUIImage(with inputModelSize: CGSize) -> UIImage? {

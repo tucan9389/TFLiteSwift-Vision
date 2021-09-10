@@ -25,6 +25,37 @@
 
 import TensorFlowLite
 
+enum TFLiteVisionInterpreterError: Error {
+    case initModelPathError(modelName: String)
+    case initInterpreterInitError
+    case initModelSetupError(error: Error)
+    case preprocessWidthHeightChannelNilError
+    case preprocessConvertToDataError
+    case preprocessResizeError
+    case invalidInputChannal(channel: Int, shape: [Int])
+}
+
+extension TFLiteVisionInterpreterError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .initModelPathError(modelName: let modelName):
+            return "Failed to load the model file with name: \(modelName)."
+        case .initInterpreterInitError:
+            return "Failed to craete interpreter"
+        case .initModelSetupError(let error):
+            return "Failed to setup tensor: \(error.localizedDescription)"
+        case .preprocessWidthHeightChannelNilError:
+            return "Failed to preprocess because width, height or channel are nil."
+        case .preprocessConvertToDataError:
+            return "Failed to convert the image buffer to data."
+        case .preprocessResizeError:
+            return "Failed to resize image"
+        case .invalidInputChannal(let channel, let shape):
+            return "Invalid channel: \(channel) of the shape(\(shape)"
+        }
+    }
+}
+
 struct TFLiteResult {
     let outputTensors: [Tensor]
 }
@@ -88,9 +119,9 @@ public class TFLiteVisionInterpreter {
         return inputChannel == 1
     }
     
-    public init(options: Options) {
+    public init(options: Options) throws {
         guard let modelPath = Bundle.main.path(forResource: options.modelName, ofType: "tflite") else {
-            fatalError("Failed to load the model file with name: \(options.modelName).")
+            throw TFLiteVisionInterpreterError.initModelPathError(modelName: options.modelName)
         }
         
         // Specify the options for the `Interpreter`.
@@ -111,7 +142,7 @@ public class TFLiteVisionInterpreter {
         }
         
         guard let interpreter = try? Interpreter(modelPath: modelPath, options: interpreterOptions, delegates: delegates) else {
-            fatalError("Failed to craete interpreter")
+            throw TFLiteVisionInterpreterError.initInterpreterInitError
         }
         
         self.interpreter = interpreter
@@ -120,7 +151,7 @@ public class TFLiteVisionInterpreter {
         do {
             try setupTensor(with: interpreter, options: options)
         } catch {
-            fatalError("Failed to setup tensor: \(error.localizedDescription)")
+            throw TFLiteVisionInterpreterError.initModelSetupError(error: error)
         }
     }
     
@@ -162,12 +193,16 @@ public class TFLiteVisionInterpreter {
         self.outputTensors = outputTensors
     }
     
-    public func preprocess(with input: TFLiteVisionInput) -> Data? {
-        guard let inputWidth = inputWidth, let inputHeight = inputHeight, let inputChannel = inputChannel else { return nil }
+    public func preprocess(with input: TFLiteVisionInput) throws -> Data {
+        guard let inputWidth = inputWidth, let inputHeight = inputHeight, let inputChannel = inputChannel else {
+            throw TFLiteVisionInterpreterError.preprocessWidthHeightChannelNilError
+        }
         
         if inputChannel == 3 {
             let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
-            guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize, and: options.cropType) else { return nil }
+            guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize, and: options.cropType) else {
+                throw TFLiteVisionInterpreterError.preprocessResizeError
+            }
             
             // Remove the alpha component from the image buffer to get the initialized `Data`.
             // let byteCount = 1 * inputHeight * inputWidth * inputChannel
@@ -177,102 +212,99 @@ public class TFLiteVisionInterpreter {
                                                     isModelQuantized: options.isQuantized,
                                                     dataType: inputDataType)
             else {
-                print("Failed to convert the image buffer to data.")
-                return nil
+                throw TFLiteVisionInterpreterError.preprocessConvertToDataError
             }
                                               
             return inputData
         } else if inputChannel == 1 {
             let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
-            guard let thumbnail = input.resizedUIImage(with: modelInputSize) else { return nil }
+            guard let thumbnail = input.resizedUIImage(with: modelInputSize) else {
+                throw TFLiteVisionInterpreterError.preprocessResizeError
+            }
             
             let inputDataType = inputTensor?.dataType ?? .float32
             guard let inputData = thumbnail.grayData(normalization: options.normalization,
                                                      isModelQuantized: options.isQuantized,
                                                      dataType: inputDataType)
             else {
-                print("Failed to convert the image buffer to data.")
-                return nil
+              throw TFLiteVisionInterpreterError.preprocessConvertToDataError
             }
                                               
             return inputData
         } else {
-            return nil
+            throw TFLiteVisionInterpreterError.invalidInputChannal(channel: inputChannel, shape: [inputHeight, inputWidth, inputChannel])
         }
     }
     
-    public func preprocess(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect) -> Data? {
-        guard let inputWidth = inputWidth, let inputHeight = inputHeight, let inputChannel = inputChannel else { return nil }
+    public func preprocess(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect) throws -> Data {
+        guard let inputWidth = inputWidth, let inputHeight = inputHeight, let inputChannel = inputChannel else {
+            throw TFLiteVisionInterpreterError.preprocessWidthHeightChannelNilError
+        }
         
         let sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer)
         assert(sourcePixelFormat == kCVPixelFormatType_32BGRA)
         
         // Resize `targetSquare` of input image to `modelSize`.
         let modelSize = CGSize(width: inputWidth, height: inputHeight)
-        guard let thumbnail = pixelBuffer.resize(from: targetSquare, to: modelSize) else { return nil }
+        guard let thumbnail = pixelBuffer.resized(from: targetSquare, to: modelSize) else {
+            throw TFLiteVisionInterpreterError.preprocessResizeError
+        }
         
         // Remove the alpha component from the image buffer to get the initialized `Data`.
         // let byteCount = 1 * inputHeight * inputWidth * inputChannel
         
-        let inputData: Data?
         if inputChannel == 3 {
-            inputData = thumbnail.rgbData(normalization: options.normalization,
-                                          isModelQuantized: options.isQuantized)
+            guard let inputData = thumbnail.rgbData(normalization: options.normalization,
+                                                    isModelQuantized: options.isQuantized) else {
+                throw TFLiteVisionInterpreterError.preprocessConvertToDataError
+            }
+          return inputData
         } else if inputChannel == 1 {
-            inputData = thumbnail.grayData(normalization: options.normalization,
-                                           isModelQuantized: options.isQuantized)
+            guard let inputData = thumbnail.grayData(normalization: options.normalization,
+                                                     isModelQuantized: options.isQuantized) else {
+              throw TFLiteVisionInterpreterError.preprocessConvertToDataError
+            }
+          return inputData
         } else {
-            print("Failed to convert the image buffer to data.")
-            inputData = nil
+            throw TFLiteVisionInterpreterError.invalidInputChannal(channel: inputChannel, shape: [inputHeight, inputWidth, inputChannel])
         }
-        
-        return inputData
     }
     
-    public func inference(with inputData: Data) -> [TFLiteFlatArray<Float32>]? {
-        // Copy the initialized `Data` to the input `Tensor`.
-        do {
-            // Copy input into interpreter's 0th `Tensor`.
-            try interpreter.copy(inputData, toInputAt: 0)
-            
-            // Run inference by invoking the `Interpreter`.
-            try interpreter.invoke()
-            
-            // Get the output `Tensor` to process the inference results.
-            for (index) in 0..<outputTensors.count {
-                outputTensors[index] = try interpreter.output(at: index)
-            }
-        } catch /*let error*/ {
-            fatalError("Failed to invoke the interpreter with error:" + error.localizedDescription)
+    public func inference(with inputData: Data) throws -> [TFLiteFlatArray<Float32>] {
+        // Copy input into interpreter's 0th `Tensor`.
+        try interpreter.copy(inputData, toInputAt: 0)
+        
+        // Run inference by invoking the `Interpreter`.
+        try interpreter.invoke()
+        
+        // Get the output `Tensor` to process the inference results.
+        for (index) in 0..<outputTensors.count {
+            outputTensors[index] = try interpreter.output(at: index)
         }
         
         return outputTensors.map { TFLiteFlatArray(tensor: $0) }
     }
     
-    public func inference(with uiImage: UIImage) -> [TFLiteFlatArray<Float32>]? {
+    public func inference(with uiImage: UIImage) throws -> [TFLiteFlatArray<Float32>] {
         let input: TFLiteVisionInput = .uiImage(uiImage: uiImage)
         
         // preprocess
-        guard let inputData: Data = preprocess(with: input)
-            else { fatalError("Cannot preprcess") }
+        let inputData: Data = try preprocess(with: input)
         
         // inference
-        guard let outputs: [TFLiteFlatArray<Float32>] = inference(with: inputData)
-            else { fatalError("Cannot inference") }
+        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: inputData)
         
         return outputs
     }
     
-    public func inference(with pixelBuffer: CVPixelBuffer) -> [TFLiteFlatArray<Float32>]? {
+    public func inference(with pixelBuffer: CVPixelBuffer) throws -> [TFLiteFlatArray<Float32>] {
         let input: TFLiteVisionInput = .pixelBuffer(pixelBuffer: pixelBuffer)
         
         // preprocess
-        guard let inputData: Data = preprocess(with: input)
-            else { fatalError("Cannot preprcess") }
+        let inputData: Data = try preprocess(with: input)
         
         // inference
-        guard let outputs: [TFLiteFlatArray<Float32>] = inference(with: inputData)
-            else { fatalError("Cannot inference") }
+        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: inputData)
         
         return outputs
     }
@@ -301,6 +333,7 @@ extension TFLiteVisionInterpreter {
     public enum CropType {
         case customAspectFill(rect: CGRect)
         case squareAspectFill
+        case scaleFill
     }
     
     public struct Options {

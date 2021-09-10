@@ -28,7 +28,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate {
             inputRankType: .bwhc,
             normalization: .scaled(from: 0.0, to: 1.0)
         )
-        visionInterpreter = TFLiteVisionInterpreter(options: interpreterOptions)
+        visionInterpreter = try? TFLiteVisionInterpreter(options: interpreterOptions)
         
          if let labelFilePath = Bundle.main.path(forResource: "labels_mobilenet_quant_v1_224", ofType: "txt") {
             labels = try? String(contentsOfFile: labelFilePath).split(separator: "\n").map { String($0) }
