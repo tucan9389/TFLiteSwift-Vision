@@ -44,8 +44,6 @@
 		AAB1116B21511218008C215D /* detect.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = detect.tflite; sourceTree = "<group>"; };
 		AAC58494214797E800FB532F /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		AAEF3D8C21A2BE2B0073AE1C /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
-		C49E810905A891EAE75C8B88 /* Pods-ObjectDetection.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectDetection.debug.xcconfig"; path = "Target Support Files/Pods-ObjectDetection/Pods-ObjectDetection.debug.xcconfig"; sourceTree = "<group>"; };
-		E2617332393262BCE1B1AC99 /* Pods-ObjectDetection.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ObjectDetection.release.xcconfig"; path = "Target Support Files/Pods-ObjectDetection/Pods-ObjectDetection.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,7 +98,6 @@
 				AA9AC59D212D39FC000B4E9D /* ObjectDetection */,
 				AA9AC59C212D39FC000B4E9D /* Products */,
 				C5C06069A877002CD7A994EB /* Pods */,
-				6D8A15B281E0E44CDD199702 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -160,8 +157,6 @@
 		C5C06069A877002CD7A994EB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				C49E810905A891EAE75C8B88 /* Pods-ObjectDetection.debug.xcconfig */,
-				E2617332393262BCE1B1AC99 /* Pods-ObjectDetection.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -238,28 +233,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		46ABBCBCBB43C1F41C7315F0 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ObjectDetection-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		AA055D8A21622F7C00B25948 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
