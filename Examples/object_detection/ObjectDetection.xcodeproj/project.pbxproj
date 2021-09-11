@@ -168,7 +168,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA9AC5C3212D39FD000B4E9D /* Build configuration list for PBXNativeTarget "ObjectDetection" */;
 			buildPhases = (
-				46ABBCBCBB43C1F41C7315F0 /* [CP] Check Pods Manifest.lock */,
 				AA055D8A21622F7C00B25948 /* ShellScript */,
 				AA9AC597212D39FC000B4E9D /* Sources */,
 				AA9AC598212D39FC000B4E9D /* Frameworks */,
