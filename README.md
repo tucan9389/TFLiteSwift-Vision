@@ -90,7 +90,7 @@ Inference with an image. The following is an image classification case.
 
 ```swift
 // inference
-guard let output: [TFLiteFlatArray<Float32>] = try? self.visionInterpreter?.inference(with: uiImage)?.first
+guard let outputs: [TFLiteFlatArray<Float32>] = try? self.visionInterpreter?.inference(with: uiImage)?.first
 	else { fatalError("Cannot inference") }
 
 // postprocess
