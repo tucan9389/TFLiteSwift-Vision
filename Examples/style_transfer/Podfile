@@ -6,6 +6,6 @@ target 'StyleTransfer' do
   use_frameworks!
 
   # Pods for StyleTransfer
-  pod 'TFLiteSwift-Vision', :path => '../../'
+  pod 'TFLiteSwift-Vision', '~> 0.2.5'
 
 end
