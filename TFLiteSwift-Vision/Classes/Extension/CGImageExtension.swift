@@ -56,14 +56,12 @@ extension CGImage {
     /// source: https://github.com/tensorflow/examples/blob/master/lite/examples/digit_classifier/ios/DigitClassifier/TFLiteExtensions.swift
     /// `UIImage` → `CGContext`(resize and make gray data) → `CGImage` → Byte `Array`(and normalization) → `Data`
     public func grayData(
-        width: Int,
-        height: Int,
         normalization: TFLiteVisionInterpreter.NormalizationOptions = .none,
         dataType: Tensor.DataType = .float32) -> Data? {
         
         guard let pixelBytes = grayImage(width: width, height: height)?.dataProvider?.data as Data? else { return nil }
         
-        let size = CGSize(width: width, height: height)
+        let size = CGSize(width: self.width, height: self.height)
         
         switch dataType {
         case .uInt8:
