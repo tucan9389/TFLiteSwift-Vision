@@ -90,13 +90,13 @@ Inference with an image. The following is an image classification case.
 
 ```swift
 // inference
-guard let outputs: [TFLiteFlatArray<Float32>] = try? self.visionInterpreter?.inference(with: uiImage)?.first
+guard let output: TFLiteFlatArray<Float32> = try? self.visionInterpreter?.inference(with: uiImage)?.first
 	else { fatalError("Cannot inference") }
 
 // postprocess
-let predictedIndex: Int = Int(outputs.argmax())
+let predictedIndex: Int = Int(output.argmax())
 print("predicted index: \(predictedLabel)")
-print(outputs.dimensions)
+print(output.dimensions)
 ```
 
 
