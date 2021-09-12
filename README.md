@@ -175,6 +175,13 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - [ ] Object detection
   - [ ] Semantic segmentation
   - [ ] Pose estimation
+- Replace TensorFlowLiteSwift to TFLiteSwift-Vision in tensorflow/examples
+  - [x] image_classification
+  - [x] object_detection
+  - [x] posenet
+  - [x] digital_classification
+  - [ ] semantic_segmentation
+
 
 ## Author
 
