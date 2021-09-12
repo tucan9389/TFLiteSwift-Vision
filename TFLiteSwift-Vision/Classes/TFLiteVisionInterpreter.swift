@@ -193,14 +193,14 @@ public class TFLiteVisionInterpreter {
         self.outputTensors = outputTensors
     }
     
-    public func preprocess(with input: TFLiteVisionInput) throws -> Data {
+    public func preprocess(with input: TFLiteVisionInput, from targetSquare: CGRect? = nil) throws -> Data {
         guard let inputWidth = inputWidth, let inputHeight = inputHeight, let inputChannel = inputChannel else {
             throw TFLiteVisionInterpreterError.preprocessWidthHeightChannelNilError
         }
         
         if inputChannel == 3 {
             let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
-            guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize, and: options.cropType) else {
+            guard let thumbnail = input.croppedPixelBuffer(with: modelInputSize, and: options.cropType, from: targetSquare) else {
                 throw TFLiteVisionInterpreterError.preprocessResizeError
             }
             
@@ -297,11 +297,11 @@ public class TFLiteVisionInterpreter {
         return outputs
     }
     
-    public func inference(with pixelBuffer: CVPixelBuffer) throws -> [TFLiteFlatArray<Float32>] {
+    public func inference(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect? = nil) throws -> [TFLiteFlatArray<Float32>] {
         let input: TFLiteVisionInput = .pixelBuffer(pixelBuffer: pixelBuffer)
         
         // preprocess
-        let inputData: Data = try preprocess(with: input)
+        let inputData: Data = try preprocess(with: input, from: targetSquare)
         
         // inference
         let outputs: [TFLiteFlatArray<Float32>] = try inference(with: inputData)
@@ -374,9 +374,18 @@ extension TFLiteVisionInterpreter {
 }
 
 extension TFLiteVisionInterpreter {
-    public enum Accelerator {
+    public enum Accelerator: Int, CaseIterable {
         case cpu
         case metal
+      
+        public var description: String {
+            switch self {
+            case .cpu:
+                return "CPU"
+            case .metal:
+                return "GPU"
+            }
+        }
     }
 }
 
