@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import TensorFlowLite
+import TFLiteSwift_Vision
 import UIKit
 
 class StyleTransferer {
 
   /// TensorFlow Lite `Interpreter` object for performing inference on a given model.
-  private var predictInterpreter: Interpreter
-  private var transferInterpreter: Interpreter
+  private var predictInterpreter: TFLiteVisionInterpreter
+  private var transferInterpreter: TFLiteVisionInterpreter
 
   /// Dedicated DispatchQueue for TF Lite operations.
   private let tfLiteQueue: DispatchQueue
@@ -52,58 +52,31 @@ class StyleTransferer {
                           completion: @escaping ((Result<StyleTransferer>) -> Void)) {
     // Create a dispatch queue to ensure all operations on the Intepreter will run serially.
     let tfLiteQueue = DispatchQueue(label: "org.tensorflow.examples.lite.style_transfer")
+    
+    let accelerator: TFLiteVisionInterpreter.Accelerator = useMetalDelegate ? .metal : .cpu
+    let threadCount: Int = ProcessInfo.processInfo.processorCount >= 2 ? 2 : 1
 
     // Run initialization in background thread to avoid UI freeze.
     tfLiteQueue.async {
-      // Construct the path to the model file.
-      guard
-          let transferModelPath = Bundle.main.path(
-            forResource: transferModel,
-            ofType: Constants.modelFileExtension
-          ),
-          let predictModelPath = Bundle.main.path(
-            forResource: predictModel,
-            ofType: Constants.modelFileExtension
-          )
-      else {
-        completion(.error(InitializationError.invalidModel(
-          "One of the following models could not be loaded: \(transferModel), \(predictModel)"
-        )))
-        return
-      }
-
-      // Specify the delegate for the TF Lite `Interpreter`.
-      let createDelegates: () -> [Delegate]? = {
-        if useMetalDelegate {
-          return [MetalDelegate()]
-        }
-        return nil
-      }
-      let createOptions: () -> Interpreter.Options? = {
-        if useMetalDelegate {
-          return nil
-        }
-        var options = Interpreter.Options()
-        options.threadCount = ProcessInfo.processInfo.processorCount >= 2 ? 2 : 1
-        return options
-      }
+      
+      let transferModelOptions = TFLiteVisionInterpreter.Options(
+        modelName: transferModel,
+        threadCount: threadCount,
+        accelerator: accelerator,
+        normalization: .scaled(from: 0.0, to: 1.0)
+      )
+      
+      let predictModelOptions = TFLiteVisionInterpreter.Options(
+        modelName: predictModel,
+        threadCount: threadCount,
+        accelerator: accelerator,
+        normalization: .scaled(from: 0.0, to: 1.0)
+      )
 
       do {
         // Create the `Interpreter`s.
-        let predictInterpreter = try Interpreter(
-          modelPath: predictModelPath,
-          options: createOptions(),
-          delegates: createDelegates()
-        )
-        let transferInterpreter = try Interpreter(
-          modelPath: transferModelPath,
-          options: createOptions(),
-          delegates: createDelegates()
-        )
-
-        // Allocate memory for the model's input `Tensor`s.
-        try predictInterpreter.allocateTensors()
-        try transferInterpreter.allocateTensors()
+        let predictInterpreter = try TFLiteVisionInterpreter(options: predictModelOptions)
+        let transferInterpreter = try TFLiteVisionInterpreter(options: transferModelOptions)
 
         // Create an StyleTransferer instance and return.
         let styleTransferer = StyleTransferer(
@@ -127,8 +100,8 @@ class StyleTransferer {
   /// Initialize Style Transferer instance.
   fileprivate init(
     tfLiteQueue: DispatchQueue,
-    predictInterpreter: Interpreter,
-    transferInterpreter: Interpreter
+    predictInterpreter: TFLiteVisionInterpreter,
+    transferInterpreter: TFLiteVisionInterpreter
   ) {
     // Store TF Lite intepreter
     self.predictInterpreter = predictInterpreter
@@ -149,7 +122,6 @@ class StyleTransferer {
                         image: UIImage,
                         completion: @escaping ((Result<StyleTransferResult>) -> Void)) {
     tfLiteQueue.async {
-      let outputTensor: Tensor
       let startTime: Date = Date()
       var preprocessingTime: TimeInterval = 0
       var stylePredictTime: TimeInterval = 0
@@ -159,61 +131,19 @@ class StyleTransferer {
       func timeSinceStart() -> TimeInterval {
         return abs(startTime.timeIntervalSinceNow)
       }
-
+      
+      let output: TFLiteFlatArray<Float32>
       do {
-        // Preprocess style image.
-        guard
-          let styleRGBData = styleImage.scaledData(
-            with: Constants.styleImageSize,
-            isQuantized: false
-          )
-        else {
-          DispatchQueue.main.async {
-            completion(.error(StyleTransferError.invalidImage))
-          }
-          print("Failed to convert the style image buffer to RGB data.")
-          return
-        }
-
-        guard
-          let inputRGBData = image.scaledData(
-            with: Constants.inputImageSize,
-            isQuantized: false
-          )
-        else {
-          DispatchQueue.main.async {
-            completion(.error(StyleTransferError.invalidImage))
-          }
-          print("Failed to convert the input image buffer to RGB data.")
-          return
-        }
-
         preprocessingTime = timeSinceStart()
-
-        // Copy the RGB data to the input `Tensor`.
-        try self.predictInterpreter.copy(styleRGBData, toInputAt: 0)
-
-        // Run inference by invoking the `Interpreter`.
-        try self.predictInterpreter.invoke()
-
-        // Get the output `Tensor` to process the inference results.
-        let predictResultTensor = try self.predictInterpreter.output(at: 0)
-
-        // Grab bottleneck data from output tensor.
-        let bottleneck = predictResultTensor.data
-
+        guard let predictOutput = try self.predictInterpreter.inference(with: styleImage).first else {
+          return
+        }
+        
+        let imageData = try self.transferInterpreter.preprocess(with: image)
+        let bottleneckData = self.transferInterpreter.convertToData(with: predictOutput)
         stylePredictTime = timeSinceStart() - preprocessingTime
-
-        // Copy the RGB and bottleneck data to the input `Tensor`.
-        try self.transferInterpreter.copy(inputRGBData, toInputAt: 0)
-        try self.transferInterpreter.copy(bottleneck, toInputAt: 1)
-
-        // Run inference by invoking the `Interpreter`.
-        try self.transferInterpreter.invoke()
-
-        // Get the result tensor
-        outputTensor = try self.transferInterpreter.output(at: 0)
-
+        
+        output = try self.transferInterpreter.inference(with: [imageData, bottleneckData]).first!
         styleTransferTime = timeSinceStart() - stylePredictTime - preprocessingTime
 
       } catch let error {
@@ -225,7 +155,10 @@ class StyleTransferer {
       }
 
       // Construct image from output tensor data
-      guard let cgImage = self.postprocessImageData(data: outputTensor.data) else {
+      let outputData = self.transferInterpreter.convertToData(with: output)
+      guard let inputWidth = self.transferInterpreter.inputWidth, let inputHeight = self.transferInterpreter.inputHeight else { return }
+      let size = CGSize(width: inputWidth, height: inputHeight)
+      guard let cgImage = self.postprocessImageData(data: outputData, size: size) else {
         DispatchQueue.main.async {
           completion(.error(StyleTransferError.resultVisualizationError))
         }
@@ -263,7 +196,7 @@ class StyleTransferer {
   ///   `Float32` values between 0 and 1 in RGB format.
   /// - Parameter size: The expected size of the output image.
   private func postprocessImageData(data: Data,
-                                    size: CGSize = Constants.inputImageSize) -> CGImage? {
+                                    size: CGSize) -> CGImage? {
     let width = Int(size.width)
     let height = Int(size.height)
 
@@ -306,7 +239,7 @@ class StyleTransferer {
         height: height,
         bitsPerComponent: 8,
         bitsPerPixel: 32,
-        bytesPerRow: MemoryLayout<UInt8>.size * 4 * Int(Constants.inputImageSize.width),
+        bytesPerRow: MemoryLayout<UInt8>.size * 4 * Int(size.width),
         space: colorSpace,
         bitmapInfo: bitmapInfo,
         provider: imageDataProvider,
@@ -397,9 +330,5 @@ private enum Constants {
   }
 
   static let modelFileExtension = "tflite"
-
-  static let styleImageSize = CGSize(width: 256, height: 256)
-
-  static let inputImageSize = CGSize(width: 384, height: 384)
 
 }
