@@ -7,6 +7,7 @@
 <!-- [![CI Status](https://img.shields.io/travis/tucan9389/TFLiteSwift-Vision.svg?style=flat)](https://travis-ci.org/tucan9389/TFLiteSwift-Vision) -->
 
 
+
 ## Table
 
 - [Goal](#goal)
@@ -43,7 +44,7 @@ target 'MyXcodeProject' do
   use_frameworks!
 
   # Pods for Your Project
-  pod 'TFLiteSwift-Vision'
+  pod 'TFLiteSwift-Vision', '~> 0.2.5'
 
 end
 
@@ -52,6 +53,12 @@ post_install do |installer|
     config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
   end
 end
+```
+
+And then, run following:
+
+```shell
+pod install
 ```
 
 ### Add `.tflite` file in the Xcode Project
@@ -71,24 +78,25 @@ import TFLiteSwift_Vision
 Setup interpreter.
 
 ```swift
-var visionInterpreter = TFLiteVisionInterpreter(options: TFLiteVisionInterpreter.Options(
+let options = TFLiteVisionInterpreter.Options(
   modelName: "mobilenet_v2_1.0_224",
   inputRankType: .bwhc,
   normalization: .scaled(from: 0.0, to: 1.0)
-))
+)
+var visionInterpreter = try? TFLiteVisionInterpreter(options: options)
 ```
 
 Inference with an image. The following is an image classification case.
 
 ```swift
 // inference
-guard let output: TFLiteFlatArray<Float32> = self.visionInterpreter?.inference(with: uiImage)
+guard let output: TFLiteFlatArray<Float32> = try? self.visionInterpreter?.inference(with: uiImage)?.first
 	else { fatalError("Cannot inference") }
 
 // postprocess
-let predictedIndex: Int = Int(outputs.argmax())
+let predictedIndex: Int = Int(output.argmax())
 print("predicted index: \(predictedLabel)")
-print(outputs.dimensions)
+print(output.dimensions)
 ```
 
 
@@ -148,7 +156,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [x] Grayscaling (not to 4 dim tensor, but to 3 dim tensor from an image)
   - Supporting cropping methods:
     - [x] Resizing (`vImageScale_ARGB8888`)
-    - [ ] Centercropping
+    - [x] Centercropping
     - [ ] Padding
     - If basic functions are implemented, need to optimize with Metal or Accelerate (or other domain specific frameworks)
   - Supporting input type
@@ -170,7 +178,8 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
 
 ## Author
 
-tucan9389, tucan.dev@gmail.com
+- [@tucan9389](https://github.com/tucan9389), tucan.dev@gmail.com
+- [@Seonghun23](https://github.com/Seonghun23), kimsh777kr@gmail.com
 
 ## License
 

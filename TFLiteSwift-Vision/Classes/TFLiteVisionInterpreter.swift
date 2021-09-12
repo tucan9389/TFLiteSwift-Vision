@@ -269,14 +269,31 @@ public class TFLiteVisionInterpreter {
             throw TFLiteVisionInterpreterError.invalidInputChannal(channel: inputChannel, shape: [inputHeight, inputWidth, inputChannel])
         }
     }
-    
-    public func inference(with inputData: Data) throws -> [TFLiteFlatArray<Float32>] {
-        // Copy input into interpreter's 0th `Tensor`.
-        try interpreter.copy(inputData, toInputAt: 0)
+  
+    public func preprocess(with uiImage: UIImage) throws -> Data {
+        let input: TFLiteVisionInput = .uiImage(uiImage: uiImage)
         
+        // preprocess
+        return try preprocess(with: input)
+    }
+  
+    public func convertToData(with tensorFlatArray: TFLiteFlatArray<Float32>) -> Data {
+        return Data(copyingBufferOf: tensorFlatArray.array)
+    }
+  
+    public func inference(with inputDataArray: [Data]) throws -> [TFLiteFlatArray<Float32>] {
+        // Copy input into interpreter's all input `Tensor`.
+        do {
+            try inputDataArray.enumerated().forEach { index, inputData in
+                try interpreter.copy(inputData, toInputAt: index)
+            }
+        } catch let error {
+            throw error
+        }
+      
         // Run inference by invoking the `Interpreter`.
         try interpreter.invoke()
-        
+      
         // Get the output `Tensor` to process the inference results.
         for (index) in 0..<outputTensors.count {
             outputTensors[index] = try interpreter.output(at: index)
@@ -292,7 +309,7 @@ public class TFLiteVisionInterpreter {
         let inputData: Data = try preprocess(with: input)
         
         // inference
-        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: inputData)
+        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: [inputData])
         
         return outputs
     }
@@ -304,7 +321,7 @@ public class TFLiteVisionInterpreter {
         let inputData: Data = try preprocess(with: input, from: targetSquare)
         
         // inference
-        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: inputData)
+        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: [inputData])
         
         return outputs
     }
@@ -317,6 +334,7 @@ extension TFLiteVisionInterpreter {
         case meanStd(mean: [Float], std: [Float])
         
         public static var pytorchNormalization: NormalizationOptions {
+            // https://github.com/jacobgil/pytorch-grad-cam/issues/6
             return .meanStd(mean: [0.485, 0.456, 0.406], std: [0.229, 0.224, 0.225])
         }
     }
