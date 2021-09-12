@@ -179,7 +179,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - [x] image_classification
   - [x] object_detection
   - [x] posenet
-  - [x] digital_classification
+  - [x] digit_classification
   - [ ] semantic_segmentation
 
 
