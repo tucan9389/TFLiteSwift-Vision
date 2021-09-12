@@ -44,7 +44,7 @@ target 'MyXcodeProject' do
   use_frameworks!
 
   # Pods for Your Project
-  pod 'TFLiteSwift-Vision', '~> 0.2.4'
+  pod 'TFLiteSwift-Vision', '~> 0.2.5'
 
 end
 
