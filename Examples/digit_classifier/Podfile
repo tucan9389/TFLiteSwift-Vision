@@ -4,6 +4,6 @@ target 'DigitClassifier' do
   use_frameworks!
   
   pod 'Sketch'
-  pod 'TFLiteSwift-Vision', :path => '../../'
+  pod 'TFLiteSwift-Vision', '~> 0.2.6'
 
 end
