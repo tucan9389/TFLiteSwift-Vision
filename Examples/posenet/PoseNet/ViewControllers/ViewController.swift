@@ -15,6 +15,7 @@
 import AVFoundation
 import UIKit
 import os
+import TFLiteSwift_Vision
 
 class ViewController: UIViewController {
   // MARK: Storyboards Connections
@@ -34,7 +35,7 @@ class ViewController: UIViewController {
 
   // MARK: ModelDataHandler traits
   var threadCount: Int = Constants.defaultThreadCount
-  var delegate: Delegates = Constants.defaultDelegate
+  var accelerator: TFLiteVisionInterpreter.Accelerator = Constants.defaultAccelerator
 
   // MARK: Result Variables
   // Inferred data to render.
@@ -89,7 +90,7 @@ class ViewController: UIViewController {
       for: .selected)
     // Remove existing segments to initialize it with `Delegates` entries.
     delegatesControl.removeAllSegments()
-    Delegates.allCases.forEach { delegate in
+    [TFLiteVisionInterpreter.Accelerator.cpu, TFLiteVisionInterpreter.Accelerator.metal].forEach { delegate in
       delegatesControl.insertSegment(
         withTitle: delegate.description,
         at: delegate.rawValue,
@@ -121,7 +122,7 @@ class ViewController: UIViewController {
     }
 
     do {
-      modelDataHandler = try ModelDataHandler(threadCount: changedCount, delegate: delegate)
+      modelDataHandler = try ModelDataHandler(threadCount: changedCount, accelerator: accelerator)
     } catch let error {
       fatalError(error.localizedDescription)
     }
@@ -131,16 +132,16 @@ class ViewController: UIViewController {
   }
 
   @IBAction func didChangeDelegate(_ sender: UISegmentedControl) {
-    guard let changedDelegate = Delegates(rawValue: delegatesControl.selectedSegmentIndex) else {
+    guard let changedAccelerator = TFLiteVisionInterpreter.Accelerator(rawValue: delegatesControl.selectedSegmentIndex) else {
       fatalError("Unexpected value from delegates segemented controller.")
     }
     do {
-      modelDataHandler = try ModelDataHandler(threadCount: threadCount, delegate: changedDelegate)
+      modelDataHandler = try ModelDataHandler(threadCount: threadCount, accelerator: changedAccelerator)
     } catch let error {
       fatalError(error.localizedDescription)
     }
-    delegate = changedDelegate
-    os_log("Delegate is changed to: %s", delegate.description)
+    accelerator = changedAccelerator
+    os_log("Delegate is changed to: %s", accelerator.description)
   }
 
   @IBAction func didTapResumeButton(_ sender: Any) {

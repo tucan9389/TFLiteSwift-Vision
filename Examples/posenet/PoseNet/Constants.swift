@@ -13,6 +13,8 @@
 // limitations under the License.
 // =============================================================================
 
+import TFLiteSwift_Vision
+
 enum Constants {
   // MARK: - Constants related to the image processing
   static let bgraPixel = (channels: 4, alphaComponent: 3, lastBgrComponent: 2)
@@ -21,5 +23,5 @@ enum Constants {
 
   // MARK: - Constants related to the model interpreter
   static let defaultThreadCount = 2
-  static let defaultDelegate: Delegates = .CPU
+  static let defaultAccelerator: TFLiteVisionInterpreter.Accelerator = .cpu
 }

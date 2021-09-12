@@ -19,7 +19,6 @@
 		8474FECB2341D39800377D34 /* CameraFeedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8474FECA2341D39800377D34 /* CameraFeedManager.swift */; };
 		848842A42370183E0043FC4C /* posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 848842A32370183E0043FC4C /* posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite */; };
 		84952CB5236186BE0052C104 /* CVPixelBufferExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84952CB4236186BE0052C104 /* CVPixelBufferExtension.swift */; };
-		84952CB92361874A0052C104 /* TFLiteExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84952CB82361874A0052C104 /* TFLiteExtension.swift */; };
 		84B67CEF2326338300A11A08 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B67CEE2326338300A11A08 /* AppDelegate.swift */; };
 		84B67CF12326338300A11A08 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B67CF02326338300A11A08 /* ViewController.swift */; };
 		84B67CF62326338400A11A08 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84B67CF52326338400A11A08 /* Assets.xcassets */; };
@@ -40,7 +39,6 @@
 		84884291236FF0A30043FC4C /* download_models.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = download_models.sh; sourceTree = "<group>"; };
 		848842A32370183E0043FC4C /* posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite; sourceTree = "<group>"; };
 		84952CB4236186BE0052C104 /* CVPixelBufferExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVPixelBufferExtension.swift; sourceTree = "<group>"; };
-		84952CB82361874A0052C104 /* TFLiteExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFLiteExtension.swift; sourceTree = "<group>"; };
 		84B67CEB2326338300A11A08 /* PoseNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PoseNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84B67CEE2326338300A11A08 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		84B67CF02326338300A11A08 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -126,7 +124,6 @@
 			isa = PBXGroup;
 			children = (
 				84952CB4236186BE0052C104 /* CVPixelBufferExtension.swift */,
-				84952CB82361874A0052C104 /* TFLiteExtension.swift */,
 				84D6576C2387BB7E0048171E /* CGSizeExtension.swift */,
 			);
 			path = Extensions;
@@ -319,7 +316,6 @@
 			files = (
 				842DDB6E2372A82000F6BB94 /* OverlayView.swift in Sources */,
 				846BAF7623E7FE13006FC136 /* Constants.swift in Sources */,
-				84952CB92361874A0052C104 /* TFLiteExtension.swift in Sources */,
 				84D6576D2387BB7E0048171E /* CGSizeExtension.swift in Sources */,
 				84B67CF12326338300A11A08 /* ViewController.swift in Sources */,
 				84B67CEF2326338300A11A08 /* AppDelegate.swift in Sources */,
@@ -476,6 +472,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5WXJ4Z4H69;
 				INFOPLIST_FILE = PoseNet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -496,6 +493,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5WXJ4Z4H69;
 				INFOPLIST_FILE = PoseNet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
