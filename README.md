@@ -12,10 +12,10 @@
 
 - [Goal](#goal)
 - [Requirements](#Requirements)
-- [Getting Started with Example](#Getting-Started-with-Example)
 - [Usage](#Usage)
-- [Done and TODO](#Done-and-TODO)
+- [Getting Started with Example](#Getting-Started-with-Example)
 - [Architecture](#Architecture)
+- [Done and TODO](#Done-and-TODO)
 - [License](#License)
 
 ## Goal
