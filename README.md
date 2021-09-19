@@ -162,6 +162,9 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - Supporting input type
     - [x] Float32
     - [x] UInt8
+  - Supporting output type
+    - [x] Float32
+    - [ ] UInt8
 - Inferenceing
   - batch size
     - [x] 1 batch
