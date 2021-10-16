@@ -14,52 +14,29 @@
 
 import CoreImage
 import UIKit
-import TensorFlowLite
+import TFLiteSwift_Vision
 
 class DigitClassifier {
 
   /// TensorFlow Lite `Interpreter` object for performing inference on a given model.
-  private var interpreter: Interpreter
-  private var inputImageWidth: Int
-  private var inputImageHeight: Int
+  private var interpreter: TFLiteVisionInterpreter
 
   static func newInstance(completion: @escaping ((Result<DigitClassifier>) -> ())) {
     // Run initialization in background thread to avoid UI freeze
     DispatchQueue.global(qos: .background).async {
-
-      // Construct the path to the model file.
-      guard let modelPath = Bundle.main.path(
-        forResource: Constant.modelFilename,
-        ofType: Constant.modelFileExtension
-        ) else {
-          print("Failed to load the model file with name: \(Constant.modelFilename).")
-          DispatchQueue.main.async {
-            completion(.error(InitializationError.invalidModel("\(Constant.modelFilename).\(Constant.modelFileExtension)")))
-          }
-          return
-      }
-
       // Specify the options for the `Interpreter`.
-      var options = InterpreterOptions()
-      options.threadCount = 2
+      let options = TFLiteVisionInterpreter.Options(
+        modelName: Constant.modelFilename,
+        threadCount: 2
+      )
 
       do {
         // Create the `Interpreter`.
-        let interpreter = try Interpreter(modelPath: modelPath, options: options)
-
-        // Allocate memory for the model's input `Tensor`s.
-        try interpreter.allocateTensors()
-
-        // Read TF Lite model input dimension
-        let inputShape = try interpreter.input(at: 0).shape
-        let inputImageWidth = inputShape.dimensions[1]
-        let inputImageHeight = inputShape.dimensions[2]
+        let interpreter = try TFLiteVisionInterpreter(options: options)
 
         // Create DigitClassifier instance and return
         let classifier = DigitClassifier(
-          interpreter: interpreter,
-          inputImageWidth: inputImageWidth,
-          inputImageHeight: inputImageHeight
+          interpreter: interpreter
         )
         DispatchQueue.main.async {
           completion(.success(classifier))
@@ -75,10 +52,8 @@ class DigitClassifier {
   }
 
   /// Initialize Digit Classifer instance
-  fileprivate init(interpreter: Interpreter, inputImageWidth: Int, inputImageHeight: Int) {
+  fileprivate init(interpreter: TFLiteVisionInterpreter) {
     self.interpreter = interpreter
-    self.inputImageWidth = inputImageWidth
-    self.inputImageHeight = inputImageHeight
   }
 
   /// Run image classification on the input image.
@@ -88,26 +63,9 @@ class DigitClassifier {
   ///   - completion: callback to receive the classification result.
   func classify(image: UIImage, completion: @escaping ((Result<String>) -> ())) {
     DispatchQueue.global(qos: .background).async {
-      let outputTensor: Tensor
+      let outputTensor: TFLiteFlatArray<Float>?
       do {
-        // Preprocessing: Convert the input UIImage to (28 x 28) grayscale image to feed to TF Lite model.
-        guard let rgbData = image.scaledData(with: CGSize(width: self.inputImageWidth, height: self.inputImageHeight))
-          else {
-            DispatchQueue.main.async {
-              completion(.error(ClassificationError.invalidImage))
-            }
-            print("Failed to convert the image buffer to RGB data.")
-            return
-        }
-
-        // Copy the RGB data to the input `Tensor`.
-        try self.interpreter.copy(rgbData, toInputAt: 0)
-
-        // Run inference by invoking the `Interpreter`.
-        try self.interpreter.invoke()
-
-        // Get the output `Tensor` to process the inference results.
-        outputTensor = try self.interpreter.output(at: 0)
+        outputTensor = try self.interpreter.inference(with: image).first
       } catch let error {
         print("Failed to invoke the interpreter with error: \(error.localizedDescription)")
         DispatchQueue.main.async {
@@ -117,7 +75,7 @@ class DigitClassifier {
       }
 
       // Postprocessing: Find the label with highest confidence and return as human readable text.
-      let results = outputTensor.data.toArray(type: Float32.self)
+      let results = outputTensor?.array ?? []
       let maxConfidence = results.max() ?? -1
       let maxIndex = results.firstIndex(of: maxConfidence) ?? -1
       let humanReadableResult = "Predicted: \(maxIndex)\nConfidence: \(maxConfidence)"

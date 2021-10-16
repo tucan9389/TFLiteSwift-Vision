@@ -1,24 +1,35 @@
 PODS:
-  - Sketch (2.0)
-  - TensorFlowLiteC (1.14.0)
-  - TensorFlowLiteSwift (1.14.0):
-    - TensorFlowLiteC (= 1.14.0)
+  - Sketch (3.0)
+  - TensorFlowLiteC (2.4.0):
+    - TensorFlowLiteC/Core (= 2.4.0)
+  - TensorFlowLiteC/Core (2.4.0)
+  - TensorFlowLiteC/CoreML (2.4.0):
+    - TensorFlowLiteC/Core
+  - TensorFlowLiteSwift/Core (2.4.0):
+    - TensorFlowLiteC (= 2.4.0)
+  - TensorFlowLiteSwift/CoreML (2.4.0):
+    - TensorFlowLiteC/CoreML (= 2.4.0)
+    - TensorFlowLiteSwift/Core (= 2.4.0)
+  - TFLiteSwift-Vision (0.2.6):
+    - TensorFlowLiteSwift/CoreML (~> 2.4.0)
 
 DEPENDENCIES:
   - Sketch
-  - TensorFlowLiteSwift
+  - TFLiteSwift-Vision (~> 0.2.6)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - Sketch
     - TensorFlowLiteC
     - TensorFlowLiteSwift
+    - TFLiteSwift-Vision
 
 SPEC CHECKSUMS:
-  Sketch: c54b898799ba34cb282b57ff42b5d0a6071e855f
-  TensorFlowLiteC: a6702011fb661928634e59565b5fe262f69692d0
-  TensorFlowLiteSwift: ac8c816ae2d65f631a96151e7991c46412aec7eb
+  Sketch: 49a4b71f7bc77316ed5f75ee79dedaa2b844d5e7
+  TensorFlowLiteC: 09f8ac75a76caeadb19bcfa694e97454cc1ecf87
+  TensorFlowLiteSwift: f062dc1178120100d825d7799fd9f115b4a37fee
+  TFLiteSwift-Vision: 4b173efa3e8c46cc66b5a163f941cbe3d437f888
 
-PODFILE CHECKSUM: db17edffc3754b40a0cf959adc9530d3838970d5
+PODFILE CHECKSUM: 09a1d942c29c6d78790fed089ed3dd9648507613
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.11.0
