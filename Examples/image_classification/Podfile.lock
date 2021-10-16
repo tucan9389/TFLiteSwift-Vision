@@ -9,7 +9,7 @@ PODS:
   - TensorFlowLiteSwift/CoreML (2.4.0):
     - TensorFlowLiteC/CoreML (= 2.4.0)
     - TensorFlowLiteSwift/Core (= 2.4.0)
-  - TFLiteSwift-Vision (0.2.6):
+  - TFLiteSwift-Vision (0.2.7):
     - TensorFlowLiteSwift/CoreML (~> 2.4.0)
 
 DEPENDENCIES:
