@@ -35,7 +35,7 @@ extension Data {
         self = array.withUnsafeBufferPointer(Data.init)
     }
   
-    public init<T>(copyingTFLiteFlatArray flatArray: TFLiteFlatArray<T>) {
+    public init(copyingTFLiteFlatArray flatArray: TFLiteFlatArray) {
         self = flatArray.array.withUnsafeBufferPointer(Data.init)
     }
     
