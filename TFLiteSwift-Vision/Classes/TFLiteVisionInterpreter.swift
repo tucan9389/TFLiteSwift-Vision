@@ -118,6 +118,15 @@ public class TFLiteVisionInterpreter {
     public var isGrayImage: Bool {
         return inputChannel == 1
     }
+  
+    public var isQuantized: Bool {
+        return inputTensor?.dataType != .float32
+    }
+  
+    public var outputDataType: Tensor.DataType {
+      outputTensors.first?.quantizationParameters
+        return outputTensors.first?.dataType ?? .float32
+    }
     
     public init(options: Options) throws {
         guard let modelPath = Bundle.main.path(forResource: options.modelName, ofType: "tflite") else {
@@ -214,7 +223,6 @@ public class TFLiteVisionInterpreter {
             
             let inputDataType = inputTensor?.dataType ?? .float32
             guard let inputData = thumbnail.rgbData(normalization: options.normalization,
-                                                    isModelQuantized: options.isQuantized,
                                                     dataType: inputDataType)
             else {
                 throw TFLiteVisionInterpreterError.preprocessConvertToDataError
@@ -259,14 +267,14 @@ public class TFLiteVisionInterpreter {
         
         if inputChannel == 3 {
             guard let inputData = thumbnail.rgbData(normalization: options.normalization,
-                                                    isModelQuantized: options.isQuantized) else {
+                                                    dataType: inputTensor?.dataType ?? .float32) else {
                 throw TFLiteVisionInterpreterError.preprocessConvertToDataError
             }
           return inputData
         } else if inputChannel == 1 {
             guard let inputData = thumbnail.grayData(normalization: options.normalization,
-                                                     isModelQuantized: options.isQuantized) else {
-              throw TFLiteVisionInterpreterError.preprocessConvertToDataError
+                                                     isModelQuantized: isQuantized) else {
+                throw TFLiteVisionInterpreterError.preprocessConvertToDataError
             }
           return inputData
         } else {
@@ -281,11 +289,7 @@ public class TFLiteVisionInterpreter {
         return try preprocess(with: input)
     }
   
-    public func convertToData(with tensorFlatArray: TFLiteFlatArray<Float32>) -> Data {
-        return Data(copyingBufferOf: tensorFlatArray.array)
-    }
-  
-    public func inference(with inputDataArray: [Data]) throws -> [TFLiteFlatArray<Float32>] {
+    public func inference<T: AdditiveArithmetic>(with inputDataArray: [Data]) throws -> [TFLiteFlatArray<T>] {
         // Copy input into interpreter's all input `Tensor`.
         do {
             try inputDataArray.enumerated().forEach { index, inputData in
@@ -306,26 +310,26 @@ public class TFLiteVisionInterpreter {
         return outputTensors.map { TFLiteFlatArray(tensor: $0) }
     }
     
-    public func inference(with uiImage: UIImage) throws -> [TFLiteFlatArray<Float32>] {
+    public func inference<T: AdditiveArithmetic>(with uiImage: UIImage) throws -> [TFLiteFlatArray<T>] {
         let input: TFLiteVisionInput = .uiImage(uiImage: uiImage)
         
         // preprocess
         let inputData: Data = try preprocess(with: input)
         
         // inference
-        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: [inputData])
+        let outputs: [TFLiteFlatArray<T>] = try inference(with: [inputData])
         
         return outputs
     }
     
-    public func inference(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect? = nil) throws -> [TFLiteFlatArray<Float32>] {
+    public func inference<T: AdditiveArithmetic>(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect? = nil) throws -> [TFLiteFlatArray<T>] {
         let input: TFLiteVisionInput = .pixelBuffer(pixelBuffer: pixelBuffer)
         
         // preprocess
         let inputData: Data = try preprocess(with: input, from: targetSquare)
         
         // inference
-        let outputs: [TFLiteFlatArray<Float32>] = try inference(with: [inputData])
+        let outputs: [TFLiteFlatArray<T>] = try inference(with: [inputData])
         
         return outputs
     }
@@ -388,7 +392,6 @@ extension TFLiteVisionInterpreter {
         let modelName: String
         let threadCount: Int
         let accelerator: Accelerator
-        let isQuantized: Bool
         
         var inputRankType: RankType
         
@@ -412,7 +415,6 @@ extension TFLiteVisionInterpreter {
             #else
             self.accelerator = accelerator
             #endif
-            self.isQuantized = isQuantized
             self.inputRankType = inputRankType
             self.normalization = normalization
             self.cropType = cropType

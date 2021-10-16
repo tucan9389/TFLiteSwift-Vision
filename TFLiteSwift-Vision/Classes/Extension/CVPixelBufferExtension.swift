@@ -107,7 +107,6 @@ extension CVPixelBuffer {
     
     func rgbData(
         normalization: TFLiteVisionInterpreter.NormalizationOptions = .none,
-        isModelQuantized: Bool,
         dataType: Tensor.DataType = .float32) -> Data? {
         CVPixelBufferLockBaseAddress(self, .readOnly)
         defer { CVPixelBufferUnlockBaseAddress(self, .readOnly) }
@@ -146,6 +145,8 @@ extension CVPixelBuffer {
             vImageConvert_BGRA8888toRGB888(&sourceBuffer, &destinationBuffer, UInt32(kvImageNoFlags))
         case kCVPixelFormatType_32ARGB:
             vImageConvert_BGRA8888toRGB888(&sourceBuffer, &destinationBuffer, UInt32(kvImageNoFlags))
+        case kCVPixelFormatType_32RGBA:
+            vImageConvert_RGBA8888toRGB888(&sourceBuffer, &destinationBuffer, UInt32(kvImageNoFlags))
         default:
             os_log("The type of this image is not supported.", type: .error)
             return nil
@@ -153,9 +154,11 @@ extension CVPixelBuffer {
         
         // Make `Data` with converted image.
         let imageByteData = Data(
-            bytes: destinationBuffer.data, count: destinationBuffer.rowBytes * height)
+            bytes: destinationBuffer.data,
+            count: destinationBuffer.rowBytes * height
+        )
         
-        if isModelQuantized { return imageByteData }
+        if dataType == .uInt8 { return imageByteData }
         
         let imageBytes = [UInt8](imageByteData)
         

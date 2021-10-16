@@ -34,6 +34,10 @@ extension Data {
     init<T>(copyingBufferOf array: [T]) {
         self = array.withUnsafeBufferPointer(Data.init)
     }
+  
+    public init<T>(copyingTFLiteFlatArray flatArray: TFLiteFlatArray<T>) {
+        self = flatArray.array.withUnsafeBufferPointer(Data.init)
+    }
     
     /// Convert a Data instance to Array representation.
     func toArray<T>(type: T.Type) -> [T] where T: AdditiveArithmetic {
