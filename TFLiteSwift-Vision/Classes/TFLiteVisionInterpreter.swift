@@ -124,7 +124,7 @@ public class TFLiteVisionInterpreter {
     }
   
     public var outputDataType: Tensor.DataType {
-      outputTensors.first?.quantizationParameters
+        // outputTensors.first?.quantizationParameters
         return outputTensors.first?.dataType ?? .float32
     }
     
@@ -289,7 +289,7 @@ public class TFLiteVisionInterpreter {
         return try preprocess(with: input)
     }
   
-    public func inference<T: AdditiveArithmetic>(with inputDataArray: [Data]) throws -> [TFLiteFlatArray<T>] {
+    public func inference(with inputDataArray: [Data]) throws -> [TFLiteFlatArray] {
         // Copy input into interpreter's all input `Tensor`.
         do {
             try inputDataArray.enumerated().forEach { index, inputData in
@@ -306,30 +306,30 @@ public class TFLiteVisionInterpreter {
         for (index) in 0..<outputTensors.count {
             outputTensors[index] = try interpreter.output(at: index)
         }
-        
-        return outputTensors.map { TFLiteFlatArray(tensor: $0) }
+      
+        return try outputTensors.map { try TFLiteFlatArray(tensor: $0) }
     }
     
-    public func inference<T: AdditiveArithmetic>(with uiImage: UIImage) throws -> [TFLiteFlatArray<T>] {
+    public func inference(with uiImage: UIImage) throws -> [TFLiteFlatArray] {
         let input: TFLiteVisionInput = .uiImage(uiImage: uiImage)
         
         // preprocess
         let inputData: Data = try preprocess(with: input)
         
         // inference
-        let outputs: [TFLiteFlatArray<T>] = try inference(with: [inputData])
+        let outputs: [TFLiteFlatArray] = try inference(with: [inputData])
         
         return outputs
     }
     
-    public func inference<T: AdditiveArithmetic>(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect? = nil) throws -> [TFLiteFlatArray<T>] {
+    public func inference(with pixelBuffer: CVPixelBuffer, from targetSquare: CGRect? = nil) throws -> [TFLiteFlatArray] {
         let input: TFLiteVisionInput = .pixelBuffer(pixelBuffer: pixelBuffer)
         
         // preprocess
         let inputData: Data = try preprocess(with: input, from: targetSquare)
         
         // inference
-        let outputs: [TFLiteFlatArray<T>] = try inference(with: [inputData])
+        let outputs: [TFLiteFlatArray] = try inference(with: [inputData])
         
         return outputs
     }
