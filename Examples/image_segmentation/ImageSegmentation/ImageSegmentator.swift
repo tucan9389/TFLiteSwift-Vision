@@ -96,9 +96,8 @@ class ImageSegmentator {
         modelName: Constants.modelFileName,
         threadCount: threadCount,
         accelerator: accelator,
-        normalization: .meanStd(
-          mean: [Constant.imageMean,Constant.imageMean,Constant.imageMean],
-          std: [Constant.imageStd,Constant.imageStd,Constant.imageStd])
+        normalization: .scaled(from: 0.0, to: 1.0),
+        cropType: .scaleFill
       )
 
       do {
