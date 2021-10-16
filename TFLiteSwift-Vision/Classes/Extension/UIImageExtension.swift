@@ -131,16 +131,33 @@ extension UIImage {
         default:
             fatalError("don't support the type: \(dataType)")
         }
-        
-//        for y in 0..<height {
-//            for x in 0..<width {
-//                let pixel = pixels[y * width + x].toUInt8s()
-//                let grayed = Float(pixel[0]) * 0.3 + Float(pixel[1]) * 0.59 + Float(pixel[2]) * 0.11
-//                array.append(grayed / 255)
-//            }
-//        }
-//
-//        return Data(copyingBufferOf: array)
+    }
+    
+    // https://github.com/tensorflow/examples/blob/master/lite/examples/digit_classifier/ios/DigitClassifier/TFLiteExtensions.swift
+    /// Returns the data representation of the image after scaling to the given `size` and converting
+    /// to grayscale.
+    ///
+    /// - Parameters
+    ///   - size: Size to scale the image to (i.e. image size used while training the model).
+    /// - Returns: The scaled image as data or `nil` if the image could not be scaled.
+    func resizedGrayCGImage(with size: CGSize) -> CGImage? {
+        guard let cgImage = self.cgImage, cgImage.width > 0, cgImage.height > 0 else { return nil }
+
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue)
+        let width = Int(size.width)
+        guard let context = CGContext(
+          data: nil,
+          width: width,
+          height: Int(size.height),
+          bitsPerComponent: cgImage.bitsPerComponent,
+          bytesPerRow: width * 1,
+          space: CGColorSpaceCreateDeviceGray(),
+          bitmapInfo: bitmapInfo.rawValue)
+          else {
+            return nil
+        }
+        context.draw(cgImage, in: CGRect(origin: .zero, size: size))
+        return context.makeImage()
     }
 }
 

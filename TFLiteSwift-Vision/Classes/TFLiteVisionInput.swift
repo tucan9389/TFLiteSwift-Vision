@@ -66,4 +66,9 @@ public enum TFLiteVisionInput {
         guard let uiImage = uiImage else { return nil }
         return uiImage.resized(targetSize: inputModelSize)
     }
+  
+    func resizedGrayCGImage(with inputModelSize: CGSize) -> CGImage? {
+        guard let uiImage = uiImage else { return nil }
+        return uiImage.resizedGrayCGImage(with: inputModelSize)
+    }
 }

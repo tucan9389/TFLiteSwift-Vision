@@ -12,10 +12,10 @@
 
 - [Goal](#goal)
 - [Requirements](#Requirements)
-- [Getting Started with Example](#Getting-Started-with-Example)
 - [Usage](#Usage)
-- [Done and TODO](#Done-and-TODO)
+- [Getting Started with Example](#Getting-Started-with-Example)
 - [Architecture](#Architecture)
+- [Done and TODO](#Done-and-TODO)
 - [License](#License)
 
 ## Goal
@@ -44,7 +44,7 @@ target 'MyXcodeProject' do
   use_frameworks!
 
   # Pods for Your Project
-  pod 'TFLiteSwift-Vision', '~> 0.2.5'
+  pod 'TFLiteSwift-Vision', '~> 0.2.6'
 
 end
 
@@ -162,6 +162,9 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - Supporting input type
     - [x] Float32
     - [x] UInt8
+  - Supporting output type
+    - [x] Float32
+    - [ ] UInt8
 - Inferenceing
   - batch size
     - [x] 1 batch
@@ -175,6 +178,13 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - [ ] Object detection
   - [ ] Semantic segmentation
   - [ ] Pose estimation
+- Replace TensorFlowLiteSwift to TFLiteSwift-Vision in tensorflow/examples
+  - [x] image_classification
+  - [x] object_detection
+  - [x] posenet
+  - [x] digit_classification
+  - [ ] semantic_segmentation
+
 
 ## Author
 
