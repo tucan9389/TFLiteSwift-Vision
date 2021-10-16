@@ -62,7 +62,7 @@ struct TFLiteResult {
 
 public class TFLiteVisionInterpreter {
     let interpreter: Interpreter
-    let options: Options
+    var options: Options
     var inputTensor: Tensor?
     var outputTensors: [Tensor] = []
     
@@ -153,6 +153,11 @@ public class TFLiteVisionInterpreter {
         } catch {
             throw TFLiteVisionInterpreterError.initModelSetupError(error: error)
         }
+      
+        // Check options validation
+        if options.inputRankType.rankCount == 4, inputTensor?.shape.dimensions.count == 3 {
+            self.options.inputRankType = options.inputRankType.reducedRank()
+        }
     }
     
     private func setupTensor(with interpreter: Interpreter, options: Options) throws {
@@ -218,14 +223,13 @@ public class TFLiteVisionInterpreter {
             return inputData
         } else if inputChannel == 1 {
             let modelInputSize = CGSize(width: inputWidth, height: inputHeight)
-            guard let thumbnail = input.resizedUIImage(with: modelInputSize) else {
+            guard let resizedCGImage = input.resizedGrayCGImage(with: modelInputSize) else {
                 throw TFLiteVisionInterpreterError.preprocessResizeError
             }
             
             let inputDataType = inputTensor?.dataType ?? .float32
-            guard let inputData = thumbnail.grayData(normalization: options.normalization,
-                                                     isModelQuantized: options.isQuantized,
-                                                     dataType: inputDataType)
+            guard let inputData = resizedCGImage.grayData(normalization: options.normalization,
+                                                          dataType: inputDataType)
             else {
               throw TFLiteVisionInterpreterError.preprocessConvertToDataError
             }
@@ -346,6 +350,32 @@ extension TFLiteVisionInterpreter {
         case bchw
         case bhw  // only gray image
         case bwh  // only gray image
+      
+        public var rankCount: Int {
+            switch self {
+            case .bwhc, .bchw, .bhwc, .bcwh:
+                return 4
+            case .bhw, .bwh:
+                return 3
+            }
+        }
+      
+        public func reducedRank() -> Self {
+            switch self {
+            case .bwhc:
+                return .bwh
+            case .bchw:
+                return .bhw
+            case .bhwc:
+                return .bhw
+            case .bcwh:
+                return .bwh
+            case .bhw:
+                return .bhw
+            case .bwh:
+                return .bwh
+            }
+        }
     }
     
     public enum CropType {
@@ -360,7 +390,7 @@ extension TFLiteVisionInterpreter {
         let accelerator: Accelerator
         let isQuantized: Bool
         
-        let inputRankType: RankType
+        var inputRankType: RankType
         
         let normalization: NormalizationOptions
         let cropType: CropType
