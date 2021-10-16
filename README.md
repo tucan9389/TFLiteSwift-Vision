@@ -164,7 +164,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
     - [x] UInt8
   - Supporting output type
     - [x] Float32
-    - [ ] UInt8
+    - [x] UInt8
 - Inferenceing
   - batch size
     - [x] 1 batch
@@ -183,7 +183,7 @@ TFLiteSwift-Vision is supporting (or wants to support) follow functions:
   - [x] object_detection
   - [x] posenet
   - [x] digit_classification
-  - [ ] semantic_segmentation
+  - [x] semantic_segmentation
 
 
 ## Author
