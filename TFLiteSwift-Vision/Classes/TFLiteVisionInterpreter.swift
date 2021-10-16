@@ -64,7 +64,7 @@ public class TFLiteVisionInterpreter {
     let interpreter: Interpreter
     var options: Options
     var inputTensor: Tensor?
-    var outputTensors: [Tensor] = []
+    public var outputTensors: [Tensor] = []
     
     public var inputWidth: Int? {
         switch options.inputRankType {
