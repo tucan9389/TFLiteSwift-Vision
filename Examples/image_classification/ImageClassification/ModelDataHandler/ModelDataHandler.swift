@@ -106,7 +106,7 @@ class ModelDataHandler {
     // Run inference by invoking the `Interpreter`.
     
     let interval: TimeInterval
-    let output: TFLiteFlatArray<Float32>?
+    let output: TFLiteFlatArray?
     do {
       let startDate = Date()
       // Get the output `TFLiteFlatArray` to process the inference results.
