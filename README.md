@@ -80,7 +80,7 @@ Setup interpreter.
 ```swift
 let options = TFLiteVisionInterpreter.Options(
   modelName: "mobilenet_v2_1.0_224",
-  inputRankType: .bwhc,
+  inputRankType: .bwhc, // if it is pytorch model, use `.bchw`
   normalization: .scaled(from: 0.0, to: 1.0)
 )
 var visionInterpreter = try? TFLiteVisionInterpreter(options: options)
@@ -90,7 +90,7 @@ Inference with an image. The following is an image classification case.
 
 ```swift
 // inference
-guard let output: TFLiteFlatArray<Float32> = try? self.visionInterpreter?.inference(with: uiImage)?.first
+guard let output: TFLiteFlatArray = try? self.visionInterpreter?.inference(with: uiImage)?.first
 	else { fatalError("Cannot inference") }
 
 // postprocess
