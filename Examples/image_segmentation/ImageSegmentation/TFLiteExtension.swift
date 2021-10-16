@@ -21,46 +21,6 @@ import UIKit
 /// Extension of iOS classes that is useful for working with TensorFlow Lite computer vision models.
 extension UIImage {
 
-  /// Creates and returns a new image scaled to the given size. The image preserves its original PNG
-  /// or JPEG bitmap info.
-  ///
-  /// - Parameter size: The size to scale the image to.
-  /// - Returns: The scaled image or `nil` if image could not be resized.
-  func scaledImage(with size: CGSize) -> UIImage? {
-    UIGraphicsBeginImageContextWithOptions(size, false, scale)
-    defer { UIGraphicsEndImageContext() }
-    draw(in: CGRect(origin: .zero, size: size))
-    return UIGraphicsGetImageFromCurrentImageContext()?.data.flatMap(UIImage.init)
-  }
-
-  /// Returns the data representation of the image after scaling to the given `size` and removing
-  /// the alpha component.
-  ///
-  /// - Parameters
-  ///   - size: Size to scale the image to (i.e. image size used while training the model).
-  ///   - byteCount: The expected byte count for the scaled image data calculated using the values
-  ///       that the model was trained on: `imageWidth * imageHeight * componentsCount * batchSize`.
-  ///   - isQuantized: Whether the model is quantized (i.e. fixed point values rather than floating
-  ///       point values).
-  /// - Returns: The scaled image as data or `nil` if the image could not be scaled.
-  func scaledData(with size: CGSize, byteCount: Int, isQuantized: Bool) -> Data? {
-    guard let cgImage = self.cgImage, cgImage.width > 0, cgImage.height > 0 else { return nil }
-    guard let imageData = imageData(from: cgImage, with: size) else { return nil }
-    var scaledBytes = [UInt8](repeating: 0, count: byteCount)
-    var index = 0
-    for component in imageData.enumerated() {
-      let offset = component.offset
-      let isAlphaComponent = (offset % Constant.alphaComponent.baseOffset)
-        == Constant.alphaComponent.moduloRemainder
-      guard !isAlphaComponent else { continue }
-      scaledBytes[index] = component.element
-      index += 1
-    }
-    if isQuantized { return Data(scaledBytes) }
-    let scaledFloats = scaledBytes.map { (Float32($0) - Constant.imageMean) / Constant.imageStd }
-    return Data(copyingBufferOf: scaledFloats)
-  }
-
   /// Make the same image with orientation being `.up`.
   /// - Returns:  A copy of the image with .up orientation or `nil` if the image could not be
   /// rotated.
@@ -178,30 +138,9 @@ extension UIImage {
   }
 }
 
-// MARK: - Data
-
-extension Data {
-  /// Creates a new buffer by copying the buffer pointer of the given array.
-  ///
-  /// - Warning: The given array's element type `T` must be trivial in that it can be copied bit
-  ///     for bit with no indirection or reference-counting operations; otherwise, reinterpreting
-  ///     data from the resulting buffer has undefined behavior.
-  /// - Parameter array: An array with elements of type `T`.
-  init<T>(copyingBufferOf array: [T]) {
-    self = array.withUnsafeBufferPointer(Data.init)
-  }
-
-  /// Convert a Data instance to Array representation.
-  func toArray<T>(type: T.Type) -> [T] where T: ExpressibleByIntegerLiteral {
-    var array = [T](repeating: 0, count: self.count/MemoryLayout<T>.stride)
-    _ = array.withUnsafeMutableBytes { copyBytes(to: $0) }
-    return array
-  }
-}
-
 // MARK: - Constants
 
-private enum Constant {
+enum Constant {
   static let jpegCompressionQuality: CGFloat = 0.8
   static let alphaComponent = (baseOffset: 4, moduloRemainder: 3)
   static let imageMean: Float32 = 127.5
