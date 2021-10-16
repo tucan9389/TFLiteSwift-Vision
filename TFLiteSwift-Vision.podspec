@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TFLiteSwift-Vision'
-  s.version          = '0.2.7'
+  s.version          = '0.2.8'
   s.summary          = 'A layer for vision\'s pre/post-processing when you are using TensorFlowLiteSwift'
 
 # This description is used to generate tags and improve search results.
