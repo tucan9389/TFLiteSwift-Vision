@@ -24,15 +24,33 @@
 
 import TensorFlowLite
 
+enum TFLiteError: Error {
+    case qauntizationError
+    case supportingDataTypeError
+}
+
 // MARK: - Wrappers
 /// Struct for handling multidimension `Data` in flat `Array`.
-public class TFLiteFlatArray<Element: AdditiveArithmetic> {
-    public var array: [Element]
+public class TFLiteFlatArray {
+    public var array: [Float]
     public var dimensions: [Int]
     
-    init(tensor: Tensor) {
+    init(tensor: Tensor) throws {
         dimensions = tensor.shape.dimensions
-        array = tensor.data.toArray(type: Element.self)
+        switch tensor.dataType {
+        case .uInt8:
+            guard let quantization = tensor.quantizationParameters else {
+                print("No results returned because the quantization values for the output tensor are nil.")
+                throw TFLiteError.qauntizationError
+            }
+            let quantizedResults = [UInt8](tensor.data)
+            array = quantizedResults.map { quantization.scale * Float(Int($0) - quantization.zeroPoint) }
+        case .float32:
+            array = tensor.data.toArray(type: Float.self)
+        default:
+            print("Output tensor data type \(tensor.dataType) is unsupported for TFLiteSwift-Vision framework.")
+            throw TFLiteError.supportingDataTypeError
+        }
     }
     
     private func flatIndex(_ index: [Int]) -> Int {
@@ -50,11 +68,11 @@ public class TFLiteFlatArray<Element: AdditiveArithmetic> {
         return result
     }
     
-    public func element(at indexes: [Int]) -> Element {
+    public func element(at indexes: [Int]) -> Float {
         return array[flatIndex(indexes)]
     }
     
-    public subscript(indexes: Int...) -> Element {
+    public subscript(indexes: Int...) -> Float {
         get { return array[flatIndex(indexes)] }
         set { array[flatIndex(indexes)] = newValue }
     }
