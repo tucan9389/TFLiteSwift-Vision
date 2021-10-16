@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import TensorFlowLite
+import TFLiteSwift_Vision
 import UIKit
 
 class ImageSegmentator {
 
   /// TensorFlow Lite `Interpreter` object for performing inference on a given model.
-  private var interpreter: Interpreter
+  private var interpreter: TFLiteVisionInterpreter
 
   /// Dedicated DispatchQueue for TF Lite operations.
   private let tfLiteQueue: DispatchQueue
 
   /// TF Lite Model's input and output shapes.
-  private let batchSize: Int
   private let inputImageWidth: Int
   private let inputImageHeight: Int
-  private let inputPixelSize: Int
   private let outputImageWidth: Int
   private let outputImageHeight: Int
   private let outputClassCount: Int
@@ -66,26 +64,6 @@ class ImageSegmentator {
 
     // Run initialization in background thread to avoid UI freeze.
     tfLiteQueue.async {
-      // Construct the path to the model file.
-      guard
-        let modelPath = Bundle.main.path(
-          forResource: Constants.modelFileName,
-          ofType: Constants.modelFileExtension
-        )
-      else {
-        print(
-          "Failed to load the model file with name: "
-            + "\(Constants.modelFileName).\(Constants.modelFileExtension)")
-        DispatchQueue.main.async {
-          completion(
-            .error(
-              InitializationError.invalidModel(
-                "\(Constants.modelFileName).\(Constants.modelFileExtension)"
-              )))
-        }
-        return
-      }
-
       // Construct the path to the label list file.
       guard let labelList = loadLabelList() else {
         print(
@@ -102,39 +80,34 @@ class ImageSegmentator {
         return
       }
 
+      
       // Specify the options for the TF Lite `Interpreter`.
-      var options: Interpreter.Options?
-      var delegates: [Delegate]?
+      var threadCount = 1
+      var accelator: TFLiteVisionInterpreter.Accelerator = .cpu
 #if targetEnvironment(simulator)
       // Use CPU for inference as MetalDelegate does not support iOS simulator.
-      options = Interpreter.Options()
-      options?.threadCount = 2
+      threadCount = 2
 #else
       // Use GPU on real device for inference as this model is fully supported.
-      delegates = [MetalDelegate()]
+      accelator = .metal
 #endif
+      
+      let interpreterOptions = TFLiteVisionInterpreter.Options(
+        modelName: Constants.modelFileName,
+        threadCount: threadCount,
+        accelerator: accelator,
+        normalization: .scaled(from: 0.0, to: 1.0),
+        cropType: .scaleFill
+      )
 
       do {
         // Create the `Interpreter`.
-        let interpreter = try Interpreter(
-          modelPath: modelPath,
-          options: options,
-          delegates: delegates
-        )
-
-        // Allocate memory for the model's input `Tensor`s.
-        try interpreter.allocateTensors()
-
-        // Read TF Lite model input and output shapes.
-        let inputShape = try interpreter.input(at: 0).shape
-        let outputShape = try interpreter.output(at: 0).shape
+        let interpreter = try TFLiteVisionInterpreter(options: interpreterOptions)
 
         // Create an ImageSegmentator instance and return.
         let segmentator = ImageSegmentator(
           tfLiteQueue: tfLiteQueue,
           interpreter: interpreter,
-          inputShape: inputShape,
-          outputShape: outputShape,
           labelList: labelList
         )
         DispatchQueue.main.async {
@@ -153,24 +126,21 @@ class ImageSegmentator {
   /// Initialize Image Segmentator instance.
   fileprivate init(
     tfLiteQueue: DispatchQueue,
-    interpreter: Interpreter,
-    inputShape: Tensor.Shape,
-    outputShape: Tensor.Shape,
+    interpreter: TFLiteVisionInterpreter,
     labelList: [String]
   ) {
     // Store TF Lite intepreter
     self.interpreter = interpreter
-
+    
     // Read input shape from model.
-    self.batchSize = inputShape.dimensions[0]
-    self.inputImageWidth = inputShape.dimensions[1]
-    self.inputImageHeight = inputShape.dimensions[2]
-    self.inputPixelSize = inputShape.dimensions[3]
-
+    self.inputImageWidth = interpreter.inputWidth ?? -1
+    self.inputImageHeight = interpreter.inputHeight ?? -1
+    
+    let outputShape = interpreter.outputTensors.first?.shape
     // Read output shape from model.
-    self.outputImageWidth = outputShape.dimensions[1]
-    self.outputImageHeight = outputShape.dimensions[2]
-    self.outputClassCount = outputShape.dimensions[3]
+    self.outputImageWidth = outputShape?.dimensions[1] ?? -1
+    self.outputImageHeight = outputShape?.dimensions[2] ?? -1
+    self.outputClassCount = outputShape?.dimensions[3] ?? -1
 
     // Store label list
     self.labelList = labelList
@@ -188,7 +158,7 @@ class ImageSegmentator {
     _ image: UIImage, completion: @escaping ((Result<SegmentationResult>) -> Void)
   ) {
     tfLiteQueue.async {
-      let outputTensor: Tensor
+      var outputFlatArray: [TFLiteFlatArray]
       var startTime: Date = Date()
       var preprocessingTime: TimeInterval = 0
       var inferenceTime: TimeInterval = 0
@@ -196,35 +166,12 @@ class ImageSegmentator {
       var visualizationTime: TimeInterval = 0
 
       do {
-        // Preprocessing: Resize the input UIImage to match with TF Lite model input shape.
-        guard
-          let rgbData = image.scaledData(
-            with: CGSize(width: self.inputImageWidth, height: self.inputImageHeight),
-            byteCount: self.inputImageWidth * self.inputImageHeight * self.inputPixelSize
-              * self.batchSize,
-            isQuantized: false
-          )
-        else {
-          DispatchQueue.main.async {
-            completion(.error(SegmentationError.invalidImage))
-          }
-          print("Failed to convert the image buffer to RGB data.")
-          return
-        }
-
         // Calculate preprocessing time.
         var now = Date()
         preprocessingTime = now.timeIntervalSince(startTime)
         startTime = Date()
-
-        // Copy the RGB data to the input `Tensor`.
-        try self.interpreter.copy(rgbData, toInputAt: 0)
-
-        // Run inference by invoking the `Interpreter`.
-        try self.interpreter.invoke()
-
-        // Get the output `Tensor` to process the inference results.
-        outputTensor = try self.interpreter.output(at: 0)
+        
+        outputFlatArray = try self.interpreter.inference(with: image)
 
         // Calculate inference time.
         now = Date()
@@ -237,9 +184,16 @@ class ImageSegmentator {
         }
         return
       }
+      
+      guard let outputArray = outputFlatArray.first else {
+        DispatchQueue.main.async {
+          completion(.error(SegmentationError.outputParsingError))
+        }
+        return
+      }
 
       // Postprocessing: Find the class with highest confidence for each pixel.
-      let parsedOutput = self.parseOutputTensor(outputTensor: outputTensor)
+      let parsedOutput = self.parseOutputTensor(outputArray: outputArray)
 
       // Calculate postprocessing time.
       // Note: You may find postprocessing very slow if you run the sample app with Debug build.
@@ -294,7 +248,7 @@ class ImageSegmentator {
 
   /// Post-processing: Convert TensorFlow Lite output tensor to segmentation map and its color
   /// representation.
-  private func parseOutputTensor(outputTensor: Tensor)
+  private func parseOutputTensor(outputArray: TFLiteFlatArray)
     -> (segmentationMap: [[Int]], segmentationImagePixels: [UInt32], classList: Set<Int>)
   {
     // Initialize the varibles to store postprocessing result.
@@ -307,7 +261,7 @@ class ImageSegmentator {
     var classList: Set<Int> = []
 
     // Convert TF Lite model output to a native Float32 array for parsing.
-    let logits = outputTensor.data.toArray(type: Float32.self)
+    let logits = outputArray.array
 
     var valMax: Float32 = 0.0
     var val: Float32 = 0.0
@@ -450,6 +404,9 @@ enum SegmentationError: Error {
 
   // TF Lite Internal Error when initializing
   case internalError(Error)
+  
+  // TF Lite output parsing Error
+  case outputParsingError
 
   // Invalid input image
   case resultVisualizationError

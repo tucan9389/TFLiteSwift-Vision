@@ -6,6 +6,12 @@ target 'ImageSegmentation' do
   use_frameworks!
 
   # Pods for ImageSegmentation
-  pod 'TensorFlowLiteSwift', '~> 0.0.1-nightly'
+  pod 'TFLiteSwift-Vision', :path => '../../'
 
+end
+
+post_install do |installer|
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+  end
 end
